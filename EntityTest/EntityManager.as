@@ -11,6 +11,7 @@ shared class EntityManager
 		if (!entityExists(entity.getId()))
 		{
 			entities.push_back(entity);
+			print("Added entity: " + entity.getId());
 		}
 	}
 
@@ -26,6 +27,7 @@ shared class EntityManager
 			if (entities[i].getId() == id)
 			{
 				entities.removeAt(i);
+				print("Removed entity: " + entities[i].getId());
 				break;
 			}
 		}
@@ -56,22 +58,21 @@ shared class EntityManager
 
 	void SyncEntities()
 	{
-		CBitStream bs;
-
 		for (uint i = 0; i < entities.size(); i++)
 		{
+			CBitStream bs;
 			entities[i].Serialize(bs);
+			rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
 		}
-
-		rules.SendCommand(rules.getCommandID("sync entities"), bs, true);
 	}
 
-	void DeserializeEntities(CBitStream@ bs)
+	void DeserializeEntity(CBitStream@ bs)
 	{
-		while (!bs.isBufferEnd())
-		{
-			//TODO
-		}
+		u16 id;
+		if (!bs.saferead_u16(id)) return;
+
+		bs.ResetBitIndex();
+		rules.set_CBitStream("_entity" + id, bs);
 	}
 
 	void UpdateEntities()

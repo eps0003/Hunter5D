@@ -16,11 +16,11 @@ shared class Entity : Serializable
 
 	void Serialize(CBitStream@ bs)
 	{
-
+		bs.write_u16(id);
 	}
 
 	bool deserialize(CBitStream@ bs)
 	{
-		return true;
+		return bs.saferead_u16(id);
 	}
 }

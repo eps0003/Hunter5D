@@ -1,4 +1,4 @@
 u16 getUniqueId()
 {
-	return getRules().addu16("_id", 1);
+	return getRules().add_u16("_id", 1);
 }
