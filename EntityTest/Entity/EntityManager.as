@@ -68,11 +68,20 @@ shared class EntityManager
 
 	void DeserializeEntity(CBitStream@ bs)
 	{
+		uint index = bs.getBitIndex();
+
 		u16 id;
 		if (!bs.saferead_u16(id)) return;
 
-		bs.ResetBitIndex();
-		rules.set_CBitStream("_entity" + id, bs);
+		string key = "_entity" + id;
+		if (!rules.exists(key))
+		{
+			AddEntity(Entity(id, name));
+		}
+
+		bs.SetBitIndex(index);
+		rules.set(key, bs);
+		rules.set_u32(key + "index", index);
 	}
 
 	void UpdateEntities()
@@ -81,18 +90,22 @@ shared class EntityManager
 		{
 			Entity@ entity = entities[i];
 
-			CBitStream@ bs = getEntityData(entity);
-			if (bs is null) continue;
+			string key = "_entity" + entity.getId();
 
-			entity.deserialize(bs);
+			CBitStream bs;
+			if (rules.get(key, bs))
+			{
+				bs.SetBitIndex(rules.get_u32(key + "index"));
+				entity.deserialize(bs);
+			}
+			else
+			{
+				print("Removed entity: " + entity.getId());
+				entities.removeAt(i--);
+				rules.set(key, null);
+				rules.clear(key + "index");
+			}
 		}
-	}
-
-	private CBitStream@ getEntityData(Entity@ entity)
-	{
-		CBitStream@ bs;
-		rules.get_CBitStream("_entity" + entity.getId(), bs);
-		return bs;
 	}
 }
 
