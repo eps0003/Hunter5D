@@ -1,5 +1,3 @@
-#include "Entity.as"
-
 shared class EntityManager
 {
 	private Entity@[] entities;
@@ -24,10 +22,16 @@ shared class EntityManager
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			if (entities[i].getId() == id)
+			u16 entityId = entities[i].getId();
+			if (entityId == id)
 			{
+				CBitStream bs;
+				bs.write_u16(entityId);
+				bs.write_bool(false);
+				rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
+
 				entities.removeAt(i);
-				print("Removed entity: " + entities[i].getId());
+				print("Removed entity: " + entityId);
 				break;
 			}
 		}
@@ -60,8 +64,12 @@ shared class EntityManager
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
+			Entity@ entity = entities[i];
+
 			CBitStream bs;
-			entities[i].Serialize(bs);
+			bs.write_u16(entity.getId());
+			bs.write_bool(true);
+			entity.Serialize(bs);
 			rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
 		}
 	}
@@ -73,15 +81,25 @@ shared class EntityManager
 		u16 id;
 		if (!bs.saferead_u16(id)) return;
 
-		string key = "_entity" + id;
-		if (!rules.exists(key))
-		{
-			AddEntity(Entity(id));
-		}
+		bool alive;
+		if (!bs.saferead_bool(alive)) return;
 
-		bs.SetBitIndex(index);
-		rules.set(key, bs);
-		rules.set_u32(key + "index", index);
+		if (alive)
+		{
+			string key = "_entity" + id;
+			if (!rules.exists(key))
+			{
+				AddEntity(Entity(id));
+			}
+
+			bs.SetBitIndex(index);
+			rules.set(key, bs);
+			rules.set_u32(key + "index", index);
+		}
+		else
+		{
+			RemoveEntity(id);
+		}
 	}
 
 	void UpdateEntities()
@@ -93,18 +111,10 @@ shared class EntityManager
 			string key = "_entity" + entity.getId();
 
 			CBitStream bs;
-			if (rules.get(key, bs))
-			{
-				bs.SetBitIndex(rules.get_u32(key + "index"));
-				entity.deserialize(bs);
-			}
-			else
-			{
-				print("Removed entity: " + entity.getId());
-				entities.removeAt(i--);
-				rules.set(key, null);
-				rules.clear(key + "index");
-			}
+			if (!rules.get(key, bs)) continue;
+
+			bs.SetBitIndex(rules.get_u32(key + "index"));
+			entity.deserialize(bs);
 		}
 	}
 }

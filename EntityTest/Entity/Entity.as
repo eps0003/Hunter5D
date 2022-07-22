@@ -1,3 +1,4 @@
+#include "EntityManager.as"
 #include "Serializable.as"
 
 shared class Entity : Serializable
@@ -14,13 +15,18 @@ shared class Entity : Serializable
 		return id;
 	}
 
+	void Kill()
+	{
+		Entity::getManager().RemoveEntity(id);
+	}
+
 	void Serialize(CBitStream@ bs)
 	{
-		bs.write_u16(id);
+
 	}
 
 	bool deserialize(CBitStream@ bs)
 	{
-		return bs.saferead_u16(id);
+		return true;
 	}
 }

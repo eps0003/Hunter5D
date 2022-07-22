@@ -1,4 +1,4 @@
-#include "EntityManager.as"
+#include "Entity.as"
 
 EntityManager@ entityManager;
 
