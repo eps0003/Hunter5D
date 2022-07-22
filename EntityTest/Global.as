@@ -1,7 +1,5 @@
 void onInit(CRules@ this)
 {
-	this.addCommandID("sync entity");
-
 	onRestart(this);
 }
 

@@ -1,21 +1,17 @@
 #include "EntityManager.as"
-#include "Utilities.as"
 
 EntityManager@ entityManager;
 
 void onInit(CRules@ this)
 {
+	this.addCommandID("sync entity");
+
 	onRestart(this);
 }
 
 void onRestart(CRules@ this)
 {
 	@entityManager = Entity::getManager();
-
-	if (isServer())
-	{
-		entityManager.AddEntity(Entity(getUniqueId()));
-	}
 }
 
 void onTick(CRules@ this)

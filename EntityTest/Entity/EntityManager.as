@@ -76,7 +76,7 @@ shared class EntityManager
 		string key = "_entity" + id;
 		if (!rules.exists(key))
 		{
-			AddEntity(Entity(id, name));
+			AddEntity(Entity(id));
 		}
 
 		bs.SetBitIndex(index);
