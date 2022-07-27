@@ -1,4 +1,5 @@
 #include "Entity.as"
+#include "Entities.as"
 
 EntityManager@ entityManager;
 
@@ -51,11 +52,32 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (!isServer() && cmd == this.getCommandID("sync entity"))
+	if (isServer()) return;
+
+	if (cmd == this.getCommandID("create entity"))
+	{
+		u16 id;
+		if (!params.saferead_u16(id)) return;
+
+		u8 type;
+		if (!params.saferead_u8(type)) return;
+
+		Entity@ entity = getEntity(id, type);
+		if (entity is null)
+		{
+			error("Attempted to create entity with invalid type: " + type);
+			return;
+		}
+
+		if (!entity.deserialize(params)) return;
+
+		Entity::getManager().AddEntity(entity);
+	}
+	else if (cmd == this.getCommandID("sync entity"))
 	{
 		entityManager.DeserializeEntity(params);
 	}
-	else if (!isServer() && cmd == this.getCommandID("remove entity"))
+	else if (cmd == this.getCommandID("remove entity"))
 	{
 		u16 id;
 		if (!params.saferead_u16(id)) return;
