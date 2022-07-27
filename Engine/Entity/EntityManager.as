@@ -1,4 +1,4 @@
-#include "Entity1.as"
+#include "Entity.as"
 
 shared class EntityManager
 {
