@@ -1,4 +1,5 @@
-#include "Entity.as"
+#include "Entity1.as"
+#include "Entity2.as"
 #include "Utilities.as"
 
 #define SERVER_ONLY
@@ -15,11 +16,16 @@ void onInit(CRules@ this)
 void onRestart(CRules@ this)
 {
 	@entityManager = Entity::getManager();
-	entityManager.AddEntity(Entity(id = getUniqueId()));
 }
 
 void onTick(CRules@ this)
 {
+	if (getGameTime() == 1)
+	{
+		entityManager.AddEntity(Entity1(id = getUniqueId(), 1));
+		entityManager.AddEntity(Entity2(getUniqueId(), "hello world"));
+	}
+
 	CPlayer@ me = getPlayerByUsername("epsilon");
 	if (me is null) return;
 

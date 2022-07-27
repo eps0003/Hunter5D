@@ -15,9 +15,19 @@ shared class Entity : Serializable
 		return id;
 	}
 
+	u8 getType()
+	{
+		return 0;
+	}
+
 	void Kill()
 	{
 		Entity::getManager().RemoveEntity(id);
+	}
+
+	void Render()
+	{
+
 	}
 
 	void Serialize(CBitStream@ bs)

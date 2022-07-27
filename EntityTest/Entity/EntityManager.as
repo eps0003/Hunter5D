@@ -1,15 +1,33 @@
+#include "Entity1.as"
+
 shared class EntityManager
 {
 	private Entity@[] entities;
 
 	private CRules@ rules = getRules();
 
+	Entity@[] getEntites()
+	{
+		return entities;
+	}
+
 	void AddEntity(Entity@ entity)
 	{
-		if (!entityExists(entity.getId()))
+		u16 id = entity.getId();
+		u8 type = entity.getType();
+
+		if (!entityExists(id))
 		{
 			entities.push_back(entity);
-			print("Added entity: " + entity.getId());
+			print("Added entity: " + id);
+
+			if (!isClient())
+			{
+				CBitStream bs;
+				bs.write_u16(id);
+				bs.write_u8(type);
+				rules.SendCommand(rules.getCommandID("create entity"), bs, true);
+			}
 		}
 	}
 
@@ -27,8 +45,7 @@ shared class EntityManager
 			{
 				CBitStream bs;
 				bs.write_u16(entityId);
-				bs.write_bool(false);
-				rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
+				rules.SendCommand(rules.getCommandID("remove entity"), bs, true);
 
 				entities.removeAt(i);
 				print("Removed entity: " + entityId);
@@ -68,7 +85,6 @@ shared class EntityManager
 
 			CBitStream bs;
 			bs.write_u16(entity.getId());
-			bs.write_bool(true);
 			entity.Serialize(bs);
 			rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
 		}
@@ -81,25 +97,12 @@ shared class EntityManager
 		u16 id;
 		if (!bs.saferead_u16(id)) return;
 
-		bool alive;
-		if (!bs.saferead_bool(alive)) return;
+		string key = "_entity" + id;
+		if (!rules.exists(key)) return;
 
-		if (alive)
-		{
-			string key = "_entity" + id;
-			if (!rules.exists(key))
-			{
-				AddEntity(Entity(id));
-			}
-
-			bs.SetBitIndex(index);
-			rules.set(key, bs);
-			rules.set_u32(key + "index", index);
-		}
-		else
-		{
-			RemoveEntity(id);
-		}
+		bs.SetBitIndex(index);
+		rules.set(key, bs);
+		rules.set_u32(key + "index", index);
 	}
 
 	void UpdateEntities()
@@ -115,6 +118,14 @@ shared class EntityManager
 
 			bs.SetBitIndex(rules.get_u32(key + "index"));
 			entity.deserialize(bs);
+		}
+	}
+
+	void RenderEntities()
+	{
+		for (uint i = 0; i < entities.size(); i++)
+		{
+			entities[i].Render();
 		}
 	}
 }
