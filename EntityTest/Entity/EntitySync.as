@@ -44,6 +44,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 		CBitStream bs;
 		bs.write_u16(entity.getId());
 		bs.write_u8(entity.getType());
+		entity.Serialize(bs);
 		this.SendCommand(this.getCommandID("create entity"), bs, player);
 	}
 }

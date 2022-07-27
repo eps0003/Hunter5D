@@ -26,6 +26,7 @@ shared class EntityManager
 				CBitStream bs;
 				bs.write_u16(id);
 				bs.write_u8(type);
+				entity.Serialize(bs);
 				rules.SendCommand(rules.getCommandID("create entity"), bs, true);
 			}
 		}

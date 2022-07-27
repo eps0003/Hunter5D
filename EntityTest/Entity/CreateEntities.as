@@ -11,18 +11,27 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		u8 type;
 		if (!params.saferead_u8(type)) return;
 
-		EntityManager@ entityManager = Entity::getManager();
-
-		switch (type)
+		Entity@ entity = getEntity(id, type);
+		if (entity is null)
 		{
-			case 0:
-				entityManager.AddEntity(Entity1(id));
-				break;
-			case 1:
-				entityManager.AddEntity(Entity2(id));
-				break;
-			default:
-				error("Attempted to create entity with invalid type " + type);
+			error("Attempted to create entity with invalid type: " + type);
+			return;
 		}
+
+		if (!entity.deserialize(params)) return;
+
+		Entity::getManager().AddEntity(entity);
 	}
+}
+
+shared Entity@ getEntity(u16 id, u8 type)
+{
+	switch (type)
+	{
+	case 0:
+		return Entity1(id);
+	case 1:
+		return Entity2(id);
+	}
+	return null;
 }

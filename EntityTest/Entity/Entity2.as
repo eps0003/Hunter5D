@@ -2,7 +2,7 @@
 
 shared class Entity2 : Entity
 {
-	string text = "hello world";
+	string text = "";
 
 	Entity2(u16 id)
 	{
