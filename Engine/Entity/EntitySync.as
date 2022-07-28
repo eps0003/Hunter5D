@@ -37,7 +37,7 @@ void onRender(CRules@ this)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	Entity@[] entities = entityManager.getEntites();
+	Entity@[] entities = entityManager.getEntities();
 	for (uint i = 0; i < entities.size(); i++)
 	{
 		Entity@ entity = entities[i];

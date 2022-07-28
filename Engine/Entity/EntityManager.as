@@ -6,7 +6,7 @@ shared class EntityManager
 
 	private CRules@ rules = getRules();
 
-	Entity@[] getEntites()
+	Entity@[] getEntities()
 	{
 		return entities;
 	}
