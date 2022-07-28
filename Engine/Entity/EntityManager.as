@@ -45,11 +45,15 @@ shared class EntityManager
 			if (entityId == id)
 			{
 				CBitStream bs;
-				bs.write_u16(entityId);
+				bs.write_u16(id);
 				rules.SendCommand(rules.getCommandID("remove entity"), bs, true);
 
 				entities.removeAt(i);
-				print("Removed entity: " + entityId);
+				print("Removed entity: " + id);
+
+				string key = "_entity" + id;
+				rules.set(key, null);
+
 				break;
 			}
 		}
