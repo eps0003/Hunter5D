@@ -1,7 +1,6 @@
 #include "EntityManager.as"
-#include "Serializable.as"
 
-shared class Entity : Serializable
+shared class Entity
 {
 	private u16 id = 0;
 
