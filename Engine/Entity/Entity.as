@@ -29,12 +29,22 @@ shared class Entity
 
 	}
 
-	void Serialize(CBitStream@ bs)
+	void SerializeInit(CBitStream@ bs)
+	{
+		SerializeTick(bs);
+	}
+
+	bool deserializeInit(CBitStream@ bs)
+	{
+		return deserializeTick(bs);
+	}
+
+	void SerializeTick(CBitStream@ bs)
 	{
 
 	}
 
-	bool deserialize(CBitStream@ bs)
+	bool deserializeTick(CBitStream@ bs)
 	{
 		return true;
 	}

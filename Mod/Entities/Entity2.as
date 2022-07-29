@@ -25,12 +25,12 @@ shared class Entity2 : Entity
 		GUI::DrawTextCentered(text, Vec2f(100, 200), color_white);
 	}
 
-	void Serialize(CBitStream@ bs)
+	void SerializeInit(CBitStream@ bs)
 	{
 		bs.write_string(text);
 	}
 
-	bool deserialize(CBitStream@ bs)
+	bool deserializeInit(CBitStream@ bs)
 	{
 		return bs.saferead_string(text);
 	}
