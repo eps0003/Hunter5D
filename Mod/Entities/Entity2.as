@@ -4,11 +4,6 @@ shared class Entity2 : Entity
 {
 	string text = "";
 
-	Entity2(u16 id)
-	{
-		super(id);
-	}
-
 	Entity2(u16 id, string text)
 	{
 		super(id);
@@ -27,11 +22,14 @@ shared class Entity2 : Entity
 
 	void SerializeInit(CBitStream@ bs)
 	{
+		Entity::SerializeInit(bs);
 		bs.write_string(text);
 	}
 
 	bool deserializeInit(CBitStream@ bs)
 	{
-		return bs.saferead_string(text);
+		if (!Entity::deserializeInit(bs)) return false;
+		if (!bs.saferead_string(text)) return false;
+		return true;
 	}
 }

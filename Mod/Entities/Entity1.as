@@ -4,11 +4,6 @@ shared class Entity1 : Entity
 {
 	int val = 0;
 
-	Entity1(u16 id)
-	{
-		super(id);
-	}
-
 	Entity1(u16 id, int val)
 	{
 		super(id);
