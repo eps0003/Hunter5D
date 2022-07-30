@@ -11,3 +11,18 @@ shared bool saferead_player(CBitStream@ bs, CPlayer@ &out player)
 	@player = getPlayerByNetworkId(id);
 	return player !is null;
 }
+
+shared bool isLocalHost()
+{
+	return isClient() && isServer();
+}
+
+shared bool isTickPaused()
+{
+	return isLocalHost() && Menu::getMainMenu() !is null;
+}
+
+shared int getFPS()
+{
+	return getRules().get_u32("fps");
+}
