@@ -1,9 +1,11 @@
 #include "Actor.as"
+#include "Interpolation.as"
 
 shared class Actor1 : Actor
 {
 	private uint tick = 0;
 	private Vec2f position;
+	private Vec2f prevPosition;
 
 	Actor1(u16 id, CPlayer@ player, Vec2f position)
 	{
@@ -20,6 +22,8 @@ shared class Actor1 : Actor
 	{
 		if (player.isMyPlayer())
 		{
+			prevPosition = position;
+
 			Vec2f dir;
 
 			CControls@ controls = getControls();
@@ -36,7 +40,9 @@ shared class Actor1 : Actor
 
 	void Render()
 	{
-		GUI::DrawTextCentered(player.getUsername() + ": " + tick + " " + getGameTime(), position, color_white);
+		string text = player.getUsername() + ": " + tick + " " + getGameTime();
+		Vec2f pos = Vec2f_lerp(prevPosition, position, Interpolation::getFrameTime());
+		GUI::DrawTextCentered(text, pos, color_white);
 	}
 
 	void SerializeTickClient(CBitStream@ bs)
@@ -48,6 +54,8 @@ shared class Actor1 : Actor
 
 	bool deserializeTickClient(CBitStream@ bs)
 	{
+		prevPosition = position;
+
 		if (!Actor::deserializeTickClient(bs)) return false;
 		if (!bs.saferead_u32(tick)) return false;
 		if (!bs.saferead_Vec2f(position)) return false;
