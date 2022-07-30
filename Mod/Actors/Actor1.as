@@ -11,6 +11,7 @@ shared class Actor1 : Actor
 	{
 		super(id, player);
 		this.position = position;
+		this.prevPosition = position;
 	}
 
 	u8 getType()
@@ -18,12 +19,15 @@ shared class Actor1 : Actor
 		return EntityType::Actor1;
 	}
 
+	void PreUpdate()
+	{
+		prevPosition = position;
+	}
+
 	void Update()
 	{
 		if (player.isMyPlayer())
 		{
-			prevPosition = position;
-
 			Vec2f dir;
 
 			CControls@ controls = getControls();
@@ -54,8 +58,6 @@ shared class Actor1 : Actor
 
 	bool deserializeTickClient(CBitStream@ bs)
 	{
-		prevPosition = position;
-
 		if (!Actor::deserializeTickClient(bs)) return false;
 		if (!bs.saferead_u32(tick)) return false;
 		if (!bs.saferead_Vec2f(position)) return false;

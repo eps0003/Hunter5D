@@ -211,6 +211,11 @@ shared class EntityManager
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
+			entities[i].PreUpdate();
+		}
+
+		for (uint i = 0; i < entities.size(); i++)
+		{
 			Entity@ entity = entities[i];
 
 			if (!isServer())
@@ -239,6 +244,11 @@ shared class EntityManager
 			}
 
 			entity.Update();
+		}
+
+		for (uint i = 0; i < entities.size(); i++)
+		{
+			entities[i].PostUpdate();
 		}
 	}
 
