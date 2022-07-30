@@ -36,6 +36,7 @@ shared class EntityManager
 		if (entityExists(id))
 		{
 			error("Attempted to add entity with ID already in use: " + type);
+			printTrace();
 			return;
 		}
 
@@ -43,6 +44,7 @@ shared class EntityManager
 		if (actor !is null && actorExists(actor.getPlayer()))
 		{
 			error("Attempted to add actor for player that already has actor: " + actor.getPlayer().getUsername());
+			printTrace();
 			return;
 		}
 
@@ -76,6 +78,7 @@ shared class EntityManager
 		}
 
 		error("Attempted to remove entity with invalid ID: " + id);
+		printTrace();
 	}
 
 	void RemoveActor(CPlayer@ player)
@@ -91,6 +94,7 @@ shared class EntityManager
 		}
 
 		error("Attempted to remove actor for player that doesn't have an actor: " + player.getUsername());
+		printTrace();
 	}
 
 	private void RemoveEntityAtIndex(uint index)
@@ -98,9 +102,12 @@ shared class EntityManager
 		Entity@ entity = entities[index];
 		u16 id = entity.getId();
 
-		CBitStream bs;
-		bs.write_u16(id);
-		rules.SendCommand(rules.getCommandID("remove entity"), bs, true);
+		if (!isClient())
+		{
+			CBitStream bs;
+			bs.write_u16(id);
+			rules.SendCommand(rules.getCommandID("remove entity"), bs, true);
+		}
 
 		entities.removeAt(index);
 		print("Removed entity: " + id);
