@@ -21,7 +21,7 @@ void onRestart(CRules@ this)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	entityManager.AddEntity(Actor1(getUniqueId(), player));
+	entityManager.AddEntity(Actor1(getUniqueId(), player, Vec2f(100, 200)));
 }
 
 void onTick(CRules@ this)
