@@ -48,6 +48,11 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 	}
 }
 
+void onPlayerLeave(CRules@ this, CPlayer@ player)
+{
+	entityManager.RemoveActor(player);
+}
+
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (!isServer() && cmd == this.getCommandID("create entity"))
@@ -67,7 +72,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 		if (!entity.deserializeInit(params)) return;
 
-		Entity::getManager().AddEntity(entity);
+		entityManager.AddEntity(entity);
 	}
 	else if (!isServer() && cmd == this.getCommandID("sync entity"))
 	{

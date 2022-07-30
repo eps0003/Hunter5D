@@ -12,24 +12,50 @@ shared class EntityManager
 		return entities;
 	}
 
+	Actor@[] getActors()
+	{
+		Actor@[] actors;
+
+		for (uint i = 0; i < entities.size(); i++)
+		{
+			Actor@ actor = cast<Actor@>(entities[i]);
+			if (actor !is null)
+			{
+				actors.push_back(actor);
+			}
+		}
+
+		return actors;
+	}
+
 	void AddEntity(Entity@ entity)
 	{
 		u16 id = entity.getId();
 		u8 type = entity.getType();
 
-		if (!entityExists(id))
+		if (entityExists(id))
 		{
-			entities.push_back(entity);
-			print("Added entity: " + id);
+			error("Attempted to add entity with ID already in use: " + type);
+			return;
+		}
 
-			if (!isClient())
-			{
-				CBitStream bs;
-				bs.write_u16(id);
-				bs.write_u8(type);
-				entity.SerializeInit(bs);
-				rules.SendCommand(rules.getCommandID("create entity"), bs, true);
-			}
+		Actor@ actor = cast<Actor@>(entity);
+		if (actor !is null && actorExists(actor.getPlayer()))
+		{
+			error("Attempted to add actor for player that already has actor: " + actor.getPlayer().getUsername());
+			return;
+		}
+
+		entities.push_back(entity);
+		print("Added entity: " + id);
+
+		if (!isClient())
+		{
+			CBitStream bs;
+			bs.write_u16(id);
+			bs.write_u8(type);
+			entity.SerializeInit(bs);
+			rules.SendCommand(rules.getCommandID("create entity"), bs, true);
 		}
 	}
 
@@ -42,22 +68,45 @@ shared class EntityManager
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			u16 entityId = entities[i].getId();
-			if (entityId == id)
+			if (entities[i].getId() == id)
 			{
-				CBitStream bs;
-				bs.write_u16(id);
-				rules.SendCommand(rules.getCommandID("remove entity"), bs, true);
-
-				entities.removeAt(i);
-				print("Removed entity: " + id);
-
-				string key = "_entity" + id;
-				rules.set(key, null);
-
-				break;
+				RemoveEntityAtIndex(i);
+				return;
 			}
 		}
+
+		error("Attempted to remove entity with invalid ID: " + id);
+	}
+
+	void RemoveActor(CPlayer@ player)
+	{
+		for (uint i = 0; i < entities.size(); i++)
+		{
+			Actor@ actor = cast<Actor@>(entities[i]);
+			if (actor !is null && actor.getPlayer() is player)
+			{
+				RemoveEntityAtIndex(i);
+				return;
+			}
+		}
+
+		error("Attempted to remove actor for player that doesn't have an actor: " + player.getUsername());
+	}
+
+	private void RemoveEntityAtIndex(uint index)
+	{
+		Entity@ entity = entities[index];
+		u16 id = entity.getId();
+
+		CBitStream bs;
+		bs.write_u16(id);
+		rules.SendCommand(rules.getCommandID("remove entity"), bs, true);
+
+		entities.removeAt(index);
+		print("Removed entity: " + id);
+
+		string key = "_entity" + id;
+		rules.set(key, null);
 	}
 
 	Entity@ getEntity(u16 id)
@@ -73,9 +122,27 @@ shared class EntityManager
 		return null;
 	}
 
+	Actor@ getActor(CPlayer@ player)
+	{
+		for (uint i = 0; i < entities.size(); i++)
+		{
+			Actor@ actor = cast<Actor@>(entities[i]);
+			if (actor !is null && actor.getPlayer() is player)
+			{
+				return actor;
+			}
+		}
+		return null;
+	}
+
 	bool entityExists(u16 id)
 	{
 		return getEntity(id) !is null;
+	}
+
+	bool actorExists(CPlayer@ player)
+	{
+		return getActor(player) !is null;
 	}
 
 	uint getEntityCount()
