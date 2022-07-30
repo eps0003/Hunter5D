@@ -1,4 +1,5 @@
 #include "EntityManager.as"
+#include "Entities.as"
 
 shared class Entity
 {
@@ -16,6 +17,7 @@ shared class Entity
 
 	u8 getType()
 	{
+		error("Entity doesn't have a type set: " + id);
 		return 0;
 	}
 

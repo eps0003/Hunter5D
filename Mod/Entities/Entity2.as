@@ -17,7 +17,7 @@ shared class Entity2 : Entity
 
 	u8 getType()
 	{
-		return 1;
+		return EntityType::Entity2;
 	}
 
 	void Render()

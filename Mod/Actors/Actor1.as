@@ -11,7 +11,7 @@ shared class Actor1 : Actor
 
 	u8 getType()
 	{
-		return 2;
+		return EntityType::Actor1;
 	}
 
 	void Render()
