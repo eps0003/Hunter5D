@@ -26,6 +26,11 @@ shared class Entity
 		Entity::getManager().RemoveEntity(id);
 	}
 
+	void Update()
+	{
+
+	}
+
 	void Render()
 	{
 

@@ -237,6 +237,8 @@ shared class EntityManager
 					actor.deserializeTickClient(bs);
 				}
 			}
+
+			entity.Update();
 		}
 	}
 
