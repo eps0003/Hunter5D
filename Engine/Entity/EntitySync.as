@@ -41,7 +41,6 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 		Entity@ entity = entities[i];
 
 		CBitStream bs;
-		bs.write_u16(entity.getId());
 		bs.write_u8(entity.getType());
 		entity.SerializeInit(bs);
 		this.SendCommand(this.getCommandID("create entity"), bs, player);
@@ -57,13 +56,10 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (!isServer() && cmd == this.getCommandID("create entity"))
 	{
-		u16 id;
-		if (!params.saferead_u16(id)) return;
-
 		u8 type;
 		if (!params.saferead_u8(type)) return;
 
-		Entity@ entity = getEntity(id, type);
+		Entity@ entity = getEntity(type);
 		if (entity is null)
 		{
 			error("Attempted to create entity with invalid type: " + type);

@@ -5,11 +5,6 @@ shared class Actor : Entity
 {
 	private CPlayer@ player;
 
-	Actor(u16 id)
-	{
-		super(id);
-	}
-
 	Actor(u16 id, CPlayer@ player)
 	{
 		super(id);
@@ -21,33 +16,26 @@ shared class Actor : Entity
 		return player;
 	}
 
-	void SerializeInitClient(CBitStream@ bs)
-	{
-		SerializeTickClient(bs);
-	}
-
-	bool deserializeInitClient(CBitStream@ bs)
-	{
-		return deserializeTickClient(bs);
-	}
-
 	void SerializeTickClient(CBitStream@ bs)
 	{
-
+		bs.write_u16(id);
 	}
 
 	bool deserializeTickClient(CBitStream@ bs)
 	{
-		return true;
+		return bs.saferead_u16(id);
 	}
 
 	void SerializeInit(CBitStream@ bs)
 	{
+		Entity::SerializeInit(bs);
 		bs.write_netid(player.getNetworkID());
 	}
 
 	bool deserializeInit(CBitStream@ bs)
 	{
-		return saferead_player(bs, player);
+		if (!Entity::deserializeInit(bs)) return false;
+		if (!saferead_player(bs, player)) return false;
+		return true;
 	}
 }

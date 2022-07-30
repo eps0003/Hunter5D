@@ -32,6 +32,8 @@ void onTick(CRules@ this)
 		// entityManager.AddEntity(Entity2(getUniqueId(), "hello world"));
 	}
 
+	if (!entityManager.entityExists(id)) return;
+
 	CPlayer@ me = getPlayerByUsername("epsilon");
 	if (me is null) return;
 

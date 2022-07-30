@@ -2,16 +2,16 @@
 #include "Entity2.as"
 #include "Actor1.as"
 
-shared Entity@ getEntity(u16 id, u8 type)
+shared Entity@ getEntity(u8 type)
 {
 	switch (type)
 	{
 	case 0:
-		return Entity1(id);
+		return Entity1();
 	case 1:
-		return Entity2(id);
+		return Entity2();
 	case 2:
-		return Actor1(id);
+		return Actor1();
 	}
 	return null;
 }

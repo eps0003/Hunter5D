@@ -4,11 +4,6 @@ shared class Actor1 : Actor
 {
 	private uint tick = 0;
 
-	Actor1(u16 id)
-	{
-		super(id);
-	}
-
 	Actor1(u16 id, CPlayer@ player)
 	{
 		super(id, player);
@@ -26,11 +21,14 @@ shared class Actor1 : Actor
 
 	void SerializeTickClient(CBitStream@ bs)
 	{
+		Actor::SerializeTickClient(bs);
 		bs.write_u32(tick = getGameTime());
 	}
 
 	bool deserializeTickClient(CBitStream@ bs)
 	{
-		return bs.saferead_u32(tick);
+		if (!Actor::deserializeTickClient(bs)) return false;
+		if (!bs.saferead_u32(tick)) return false;
+		return true;
 	}
 }

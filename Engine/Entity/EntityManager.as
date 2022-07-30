@@ -54,7 +54,6 @@ shared class EntityManager
 		if (!isClient())
 		{
 			CBitStream bs;
-			bs.write_u16(id);
 			bs.write_u8(type);
 			entity.SerializeInit(bs);
 			rules.SendCommand(rules.getCommandID("create entity"), bs, true);
@@ -166,7 +165,6 @@ shared class EntityManager
 			if (!isClient())
 			{
 				CBitStream bs;
-				bs.write_u16(entity.getId());
 				entity.SerializeTick(bs);
 				rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
 			}
@@ -175,7 +173,6 @@ shared class EntityManager
 			if (actor !is null && actor.getPlayer().isMyPlayer())
 			{
 				CBitStream bs;
-				bs.write_u16(entity.getId());
 				actor.SerializeTickClient(bs);
 				rules.SendCommand(rules.getCommandID("sync actor"), bs, true);
 			}
@@ -184,11 +181,12 @@ shared class EntityManager
 
 	void DeserializeEntity(CBitStream@ bs)
 	{
+		uint index = bs.getBitIndex();
+
 		u16 id;
 		if (!bs.saferead_u16(id)) return;
 
 		string key = "_entity" + id;
-		uint index = bs.getBitIndex();
 
 		bs.SetBitIndex(index);
 		rules.set(key, bs);
@@ -197,11 +195,12 @@ shared class EntityManager
 
 	void DeserializeActor(CBitStream@ bs)
 	{
+		uint index = bs.getBitIndex();
+
 		u16 id;
 		if (!bs.saferead_u16(id)) return;
 
 		string key = "_actor" + id;
-		uint index = bs.getBitIndex();
 
 		bs.SetBitIndex(index);
 		rules.set(key, bs);

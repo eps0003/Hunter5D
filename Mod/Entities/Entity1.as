@@ -27,11 +27,14 @@ shared class Entity1 : Entity
 
 	void SerializeInit(CBitStream@ bs)
 	{
+		Entity::SerializeInit(bs);
 		bs.write_s32(val);
 	}
 
 	bool deserializeInit(CBitStream@ bs)
 	{
-		return bs.saferead_s32(val);
+		if (!Entity::deserializeInit(bs)) return false;
+		if (!bs.saferead_s32(val)) return false;
+		return true;
 	}
 }

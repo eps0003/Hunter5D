@@ -31,21 +31,21 @@ shared class Entity
 
 	void SerializeInit(CBitStream@ bs)
 	{
-		SerializeTick(bs);
+		bs.write_u16(id);
 	}
 
 	bool deserializeInit(CBitStream@ bs)
 	{
-		return deserializeTick(bs);
+		return bs.saferead_u16(id);
 	}
 
 	void SerializeTick(CBitStream@ bs)
 	{
-
+		bs.write_u16(id);
 	}
 
 	bool deserializeTick(CBitStream@ bs)
 	{
-		return true;
+		return bs.saferead_u16(id);
 	}
 }
