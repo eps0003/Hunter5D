@@ -7,6 +7,7 @@ void onInit(CRules@ this)
 {
 	this.addCommandID("create entity");
 	this.addCommandID("sync entity");
+	this.addCommandID("sync actor");
 	this.addCommandID("remove entity");
 
 	onRestart(this);
@@ -19,15 +20,12 @@ void onRestart(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	if (!isClient() && getPlayerCount() > 0)
+	if (getPlayerCount() > 0)
 	{
 		entityManager.SyncEntities();
 	}
 
-	if (!isServer())
-	{
-		entityManager.UpdateEntities();
-	}
+	entityManager.UpdateEntities();
 }
 
 void onRender(CRules@ this)
@@ -52,9 +50,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (isServer()) return;
-
-	if (cmd == this.getCommandID("create entity"))
+	if (!isServer() && cmd == this.getCommandID("create entity"))
 	{
 		u16 id;
 		if (!params.saferead_u16(id)) return;
@@ -73,11 +69,15 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 		Entity::getManager().AddEntity(entity);
 	}
-	else if (cmd == this.getCommandID("sync entity"))
+	else if (!isServer() && cmd == this.getCommandID("sync entity"))
 	{
 		entityManager.DeserializeEntity(params);
 	}
-	else if (cmd == this.getCommandID("remove entity"))
+	else if (cmd == this.getCommandID("sync actor"))
+	{
+		entityManager.DeserializeActor(params);
+	}
+	else if (!isServer() && cmd == this.getCommandID("remove entity"))
 	{
 		u16 id;
 		if (!params.saferead_u16(id)) return;

@@ -1,4 +1,5 @@
 #include "Entity.as"
+#include "Actor.as"
 
 shared class EntityManager
 {
@@ -26,7 +27,7 @@ shared class EntityManager
 				CBitStream bs;
 				bs.write_u16(id);
 				bs.write_u8(type);
-				entity.Serialize(bs);
+				entity.SerializeInit(bs);
 				rules.SendCommand(rules.getCommandID("create entity"), bs, true);
 			}
 		}
@@ -88,22 +89,45 @@ shared class EntityManager
 		{
 			Entity@ entity = entities[i];
 
-			CBitStream bs;
-			bs.write_u16(entity.getId());
-			entity.Serialize(bs);
-			rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
+			if (!isClient())
+			{
+				CBitStream bs;
+				bs.write_u16(entity.getId());
+				entity.SerializeTick(bs);
+				rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
+			}
+
+			Actor@ actor = cast<Actor@>(entity);
+			if (actor !is null && actor.getPlayer().isMyPlayer())
+			{
+				CBitStream bs;
+				bs.write_u16(entity.getId());
+				actor.SerializeTickClient(bs);
+				rules.SendCommand(rules.getCommandID("sync actor"), bs, true);
+			}
 		}
 	}
 
 	void DeserializeEntity(CBitStream@ bs)
 	{
-		uint index = bs.getBitIndex();
-
 		u16 id;
 		if (!bs.saferead_u16(id)) return;
 
 		string key = "_entity" + id;
-		if (!rules.exists(key)) return;
+		uint index = bs.getBitIndex();
+
+		bs.SetBitIndex(index);
+		rules.set(key, bs);
+		rules.set_u32(key + "index", index);
+	}
+
+	void DeserializeActor(CBitStream@ bs)
+	{
+		u16 id;
+		if (!bs.saferead_u16(id)) return;
+
+		string key = "_actor" + id;
+		uint index = bs.getBitIndex();
 
 		bs.SetBitIndex(index);
 		rules.set(key, bs);
@@ -116,13 +140,30 @@ shared class EntityManager
 		{
 			Entity@ entity = entities[i];
 
-			string key = "_entity" + entity.getId();
+			if (!isServer())
+			{
+				string key = "_entity" + entity.getId();
 
-			CBitStream bs;
-			if (!rules.get(key, bs)) continue;
+				CBitStream bs;
+				if (rules.get(key, bs))
+				{
+					bs.SetBitIndex(rules.get_u32(key + "index"));
+					entity.deserializeTick(bs);
+				}
+			}
 
-			bs.SetBitIndex(rules.get_u32(key + "index"));
-			entity.deserialize(bs);
+			Actor@ actor = cast<Actor@>(entity);
+			if (actor !is null && !actor.getPlayer().isMyPlayer())
+			{
+				string key = "_actor" + actor.getId();
+
+				CBitStream bs;
+				if (rules.get(key, bs))
+				{
+					bs.SetBitIndex(rules.get_u32(key + "index"));
+					actor.deserializeTickClient(bs);
+				}
+			}
 		}
 	}
 
