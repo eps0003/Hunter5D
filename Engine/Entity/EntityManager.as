@@ -18,7 +18,7 @@ shared class EntityManager
 
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			Actor@ actor = cast<Actor@>(entities[i]);
+			Actor@ actor = cast<Actor>(entities[i]);
 			if (actor !is null)
 			{
 				actors.push_back(actor);
@@ -40,7 +40,7 @@ shared class EntityManager
 			return;
 		}
 
-		Actor@ actor = cast<Actor@>(entity);
+		Actor@ actor = cast<Actor>(entity);
 		if (actor !is null && actorExists(actor.getPlayer()))
 		{
 			error("Attempted to add actor for player that already has actor: " + actor.getPlayer().getUsername());
@@ -84,7 +84,7 @@ shared class EntityManager
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			Actor@ actor = cast<Actor@>(entities[i]);
+			Actor@ actor = cast<Actor>(entities[i]);
 			if (actor !is null && actor.getPlayer() is player)
 			{
 				RemoveEntityAtIndex(i);
@@ -132,7 +132,7 @@ shared class EntityManager
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			Actor@ actor = cast<Actor@>(entities[i]);
+			Actor@ actor = cast<Actor>(entities[i]);
 			if (actor !is null && actor.getPlayer() is player)
 			{
 				return actor;
@@ -169,7 +169,7 @@ shared class EntityManager
 				rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
 			}
 
-			Actor@ actor = cast<Actor@>(entity);
+			Actor@ actor = cast<Actor>(entity);
 			if (actor !is null && actor.getPlayer().isMyPlayer())
 			{
 				CBitStream bs;
@@ -230,7 +230,7 @@ shared class EntityManager
 				}
 			}
 
-			Actor@ actor = cast<Actor@>(entity);
+			Actor@ actor = cast<Actor>(entity);
 			if (actor !is null && !actor.getPlayer().isMyPlayer())
 			{
 				string key = "_actor" + actor.getId();
