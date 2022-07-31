@@ -39,22 +39,22 @@ void onTick(CRules@ this)
 {
 	if (getGameTime() == 1)
 	{
-		entityManager.AddEntity(Entity1(id = getUniqueId(), 1));
+		// entityManager.AddEntity(Entity1(id = getUniqueId(), 1));
 		// entityManager.AddEntity(Entity2(getUniqueId(), "hello world"));
 	}
 
-	if (!entityManager.entityExists(id)) return;
+	// if (!entityManager.entityExists(id)) return;
 
-	CPlayer@ me = getPlayerByUsername("epsilon");
-	if (me is null) return;
+	// CPlayer@ me = getPlayerByUsername("epsilon");
+	// if (me is null) return;
 
-	CBlob@ blob = me.getBlob();
-	if (blob is null) return;
+	// CBlob@ blob = me.getBlob();
+	// if (blob is null) return;
 
-	if (blob.isKeyJustPressed(key_action3))
-	{
-		entityManager.RemoveEntity(id);
-	}
+	// if (blob.isKeyJustPressed(key_action3))
+	// {
+	// 	entityManager.RemoveEntity(id);
+	// }
 }
 
 void SpawnPlayer(CPlayer@ player, Vec2f position)
