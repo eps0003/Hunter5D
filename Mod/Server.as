@@ -27,7 +27,6 @@ void onRestart(CRules@ this)
 		{
 			SpawnPlayer(player, SPAWN_POSITION);
 		}
-
 	}
 }
 
