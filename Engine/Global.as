@@ -4,6 +4,11 @@ void onInit(CRules@ this)
 	getSecurity().reloadSecurity();
 	CFileImage::silent_errors = true;
 	GUI::SetFont("menu");
+
+	if (isServer())
+	{
+		sv_mapautocycle = true;
+	}
 }
 
 void onRestart(CRules@ this)
