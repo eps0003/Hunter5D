@@ -30,7 +30,10 @@ void onTick(CRules@ this)
 
 void onRender(CRules@ this)
 {
-	entityManager.RenderEntities();
+	if (entityManager !is null)
+	{
+		entityManager.RenderEntities();
+	}
 }
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)

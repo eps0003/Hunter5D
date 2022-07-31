@@ -21,11 +21,4 @@ namespace Config
 	{
 		return sv_gamemode + ".cfg";
 	}
-
-	shared void ResetConfig()
-	{
-		ConfigFile cfg;
-		getRules().set("config", cfg);
-		SaveConfig(cfg);
-	}
 }
