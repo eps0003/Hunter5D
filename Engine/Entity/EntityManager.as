@@ -170,7 +170,7 @@ shared class EntityManager
 			}
 
 			Actor@ actor = cast<Actor>(entity);
-			if (actor !is null && actor.getPlayer().isMyPlayer())
+			if (actor !is null && actor.getPlayer().isMyPlayer() && !isServer())
 			{
 				CBitStream bs;
 				actor.SerializeTickClient(bs);

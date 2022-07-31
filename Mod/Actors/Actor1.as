@@ -28,6 +28,8 @@ shared class Actor1 : Actor
 	{
 		if (player.isMyPlayer())
 		{
+			tick = getGameTime();
+
 			Vec2f dir;
 
 			CControls@ controls = getControls();
@@ -52,7 +54,7 @@ shared class Actor1 : Actor
 	void SerializeTickClient(CBitStream@ bs)
 	{
 		Actor::SerializeTickClient(bs);
-		bs.write_u32(tick = getGameTime());
+		bs.write_u32(tick);
 		bs.write_Vec2f(position);
 	}
 
