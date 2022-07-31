@@ -1,3 +1,5 @@
+#include "Maths.as"
+
 shared u16 getUniqueId()
 {
 	return getRules().add_u16("_id", 1);
@@ -25,4 +27,35 @@ shared bool isTickPaused()
 shared int getFPS()
 {
 	return getRules().get_u32("fps");
+}
+
+shared string trimFileExtension(string fileName)
+{
+	return fileName.substr(0, fileName.findLast("."));
+}
+
+shared string formatDuration(float duration, bool showMilliseconds = false)
+{
+	s8 sign = Maths::Sign(duration);
+	float totalSeconds = Maths::Abs(duration) / getTicksASecond();
+	uint hours = totalSeconds / 3600;
+	totalSeconds %= 3600;
+	u8 minutes = totalSeconds / 60;
+	u8 seconds = totalSeconds % 60;
+	totalSeconds %= 1;
+	u16 milliseconds = totalSeconds * 1000;
+
+	string text = hours + ":" + formatInt(minutes, "0", 2) + ":" + formatInt(seconds, "0", 2);
+
+	if (showMilliseconds)
+	{
+		text += "." + formatInt(milliseconds, "0", 3);
+	}
+
+	if (sign < 0)
+	{
+		text = "-" + text;
+	}
+
+	return text;
 }
