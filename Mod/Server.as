@@ -5,6 +5,8 @@
 
 #define SERVER_ONLY
 
+const Vec2f SPAWN_POSITION = Vec2f(100, 200);
+
 EntityManager@ entityManager;
 
 u16 id = 0;
@@ -17,11 +19,21 @@ void onInit(CRules@ this)
 void onRestart(CRules@ this)
 {
 	@entityManager = Entity::getManager();
+
+	for (uint i = 0; i < getPlayerCount(); i++)
+	{
+		CPlayer@ player = getPlayer(i);
+		if (player !is null)
+		{
+			SpawnPlayer(player, SPAWN_POSITION);
+		}
+
+	}
 }
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	entityManager.AddEntity(Actor1(getUniqueId(), player, Vec2f(100, 200)));
+	SpawnPlayer(player, SPAWN_POSITION);
 }
 
 void onTick(CRules@ this)
@@ -44,4 +56,9 @@ void onTick(CRules@ this)
 	{
 		entityManager.RemoveEntity(id);
 	}
+}
+
+void SpawnPlayer(CPlayer@ player, Vec2f position)
+{
+	entityManager.AddEntity(Actor1(getUniqueId(), player, position));
 }
