@@ -51,7 +51,7 @@ shared class EntityManager
 		entities.push_back(entity);
 		print("Added entity: " + id);
 
-		if (!isClient())
+		if (isServer())
 		{
 			CBitStream bs;
 			bs.write_u8(type);
@@ -101,7 +101,7 @@ shared class EntityManager
 		Entity@ entity = entities[index];
 		u16 id = entity.getId();
 
-		if (!isClient())
+		if (isServer())
 		{
 			CBitStream bs;
 			bs.write_u16(id);
@@ -162,7 +162,7 @@ shared class EntityManager
 		{
 			Entity@ entity = entities[i];
 
-			if (!isClient())
+			if (isServer())
 			{
 				CBitStream bs;
 				entity.SerializeTick(bs);
