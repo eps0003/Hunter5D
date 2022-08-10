@@ -12,12 +12,6 @@ shared class LoadStep
 		this.message = message;
 	}
 
-	u8 getType()
-	{
-		error("Load step doesn't have a type set: " + message);
-		return 0;
-	}
-
 	string getMessage()
 	{
 		return message;
@@ -25,7 +19,7 @@ shared class LoadStep
 
 	float getProgress()
 	{
-		return progress;
+		return Maths::Clamp01(progress);
 	}
 
 	bool isComplete()

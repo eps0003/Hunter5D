@@ -84,11 +84,6 @@ shared class LoadingManager
 			rules.set_u8("server load index", index);
 			rules.Sync("server load index", true);
 		}
-
-		if (getGameTime() % (getTicksASecond() / 2) == 0)
-		{
-			print(step.getMessage() + " (" + Maths::Floor(step.getProgress() * 100) + "%)");
-		}
 	}
 
 	private void SkipSteps()
@@ -142,7 +137,7 @@ shared class LoadingManager
 
 	bool isPlayerLoaded(CPlayer@ player)
 	{
-		return rules.get_bool("_loaded" + player.getUsername());
+		return player !is null && rules.get_bool("_loaded" + player.getUsername());
 	}
 
 	bool isMyPlayerLoaded()

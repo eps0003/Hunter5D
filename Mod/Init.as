@@ -1,6 +1,6 @@
 #include "Loading.as"
-#include "ClientLoadStep1.as"
-#include "ServerLoadStep1.as"
+#include "TestClientLoadStep.as"
+#include "TestServerLoadStep.as"
 
 void onInit(CRules@ this)
 {
@@ -10,10 +10,10 @@ void onInit(CRules@ this)
 void onRestart(CRules@ this)
 {
 	LoadingManager@ loadingManager = Loading::getManager();
-	loadingManager.AddStep(ClientLoadStep1());
-	loadingManager.AddStep(ServerLoadStep1());
-	loadingManager.AddStep(ClientLoadStep1());
-	loadingManager.AddStep(ServerLoadStep1());
-	loadingManager.AddStep(ClientLoadStep1());
-	loadingManager.AddStep(ServerLoadStep1());
+	loadingManager.AddStep(TestClientLoadStep("Client 1"));
+	loadingManager.AddStep(TestServerLoadStep("Server 2"));
+	loadingManager.AddStep(TestClientLoadStep("Client 3"));
+	loadingManager.AddStep(TestServerLoadStep("Server 4"));
+	loadingManager.AddStep(TestClientLoadStep("Client 5"));
+	loadingManager.AddStep(TestServerLoadStep("Server 6"));
 }
