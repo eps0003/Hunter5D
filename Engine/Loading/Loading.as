@@ -9,6 +9,17 @@ shared class LoadingManager
 
 	private CRules@ rules = getRules();
 
+	~LoadingManager()
+	{
+		for (uint i = 0; i < getPlayerCount(); i++)
+		{
+			CPlayer@ player = getPlayer(i);
+			if (player is null) continue;
+
+			rules.set_bool("_loaded" + player.getUsername(), false);
+		}
+	}
+
 	void AddStep(LoadStep@ step)
 	{
 		loadSteps.push_back(step);
@@ -27,10 +38,20 @@ shared class LoadingManager
 
 	void Update()
 	{
+		if (isMyPlayerLoaded()) return;
+
 		SkipSteps();
 
 		LoadStep@ step = getCurrentStep();
-		if (step is null) return;
+		if (step is null)
+		{
+			// Set loaded the tick after the last step is complete
+			if (!isServer())
+			{
+				SetMyPlayerLoaded();
+			}
+			return;
+		}
 
 		ClientLoadStep@ clientStep = cast<ClientLoadStep>(step);
 		ServerLoadStep@ serverStep = cast<ServerLoadStep>(step);
@@ -114,21 +135,14 @@ shared class LoadingManager
 		}
 	}
 
-	bool isLoaded()
+	bool isServerLoaded()
 	{
-		return index >= loadSteps.size();
+		return rules.get_u8("server load index") >= loadSteps.size();
 	}
 
 	bool isPlayerLoaded(CPlayer@ player)
 	{
-		for (uint i = 0; i < loadedPlayers.size(); i++)
-		{
-			if (loadedPlayers[i] is player)
-			{
-				return true;
-			}
-		}
-		return false;
+		return rules.get_bool("_loaded" + player.getUsername());
 	}
 
 	bool isMyPlayerLoaded()
@@ -145,7 +159,7 @@ shared class LoadingManager
 			return;
 		}
 
-		loadedPlayers.push_back(player);
+		rules.set_bool("_loaded" + player.getUsername(), true);
 
 		if (isServer())
 		{
@@ -167,37 +181,69 @@ shared class LoadingManager
 
 	void RemoveLoadedPlayer(CPlayer@ player)
 	{
-		for (uint i = 0; i < loadedPlayers.size(); i++)
+		if (isPlayerLoaded(player))
 		{
-			if (loadedPlayers[i] is player)
-			{
-				loadedPlayers.removeAt(i);
-				break;
-			}
+			error("Attempted to remove loaded player who isn't loaded: " + player.getUsername());
+			printTrace();
+			return;
 		}
 
-		error("Attempted to remove loaded player who isn't loaded: " + player.getUsername());
-		printTrace();
+		rules.set_bool("_loaded" + player.getUsername(), false);
 	}
 
 	bool areAllPlayersLoaded()
 	{
-		return loadedPlayers.size() == getPlayerCount();
+		for (uint i = 0; i < getPlayerCount(); i++)
+		{
+			CPlayer@ player = getPlayer(i);
+			if (player is null) continue;
+
+			if (!isPlayerLoaded(player))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	bool areAnyPlayersLoaded()
 	{
-		return loadedPlayers.size() > 0;
+		for (uint i = 0; i < getPlayerCount(); i++)
+		{
+			CPlayer@ player = getPlayer(i);
+			if (player is null) continue;
+
+			if (isPlayerLoaded(player))
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	uint getLoadedPlayerCount()
 	{
-		return loadedPlayers.size();
+		return getLoadedPlayers().size();
 	}
 
 	CPlayer@[] getLoadedPlayers()
 	{
-		return loadedPlayers;
+		CPlayer@[] players;
+
+		for (uint i = 0; i < getPlayerCount(); i++)
+		{
+			CPlayer@ player = getPlayer(i);
+			if (player is null) continue;
+
+			if (isPlayerLoaded(player))
+			{
+				players.push_back(player);
+			}
+		}
+
+		return players;
 	}
 }
 
