@@ -1,6 +1,7 @@
 #include "Loading.as"
 #include "TestClientLoadStep.as"
 #include "TestServerLoadStep.as"
+#include "ServerGenerateMap.as"
 
 void onInit(CRules@ this)
 {
@@ -10,6 +11,7 @@ void onInit(CRules@ this)
 void onRestart(CRules@ this)
 {
 	LoadingManager@ loadingManager = Loading::getManager();
+	loadingManager.AddStep(ServerGenerateMap());
 	// loadingManager.AddStep(TestClientLoadStep("Client 1"));
 	// loadingManager.AddStep(TestServerLoadStep("Server 2"));
 	// loadingManager.AddStep(TestClientLoadStep("Client 3"));

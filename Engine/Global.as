@@ -15,4 +15,7 @@ void onRestart(CRules@ this)
 {
 	this.set("entity manager", null);
 	this.set("loading manager", null);
+
+	// TODO: Move 3D-specific resets out of engine
+	this.set("map", null);
 }

@@ -1,5 +1,4 @@
 #include "SpectatorActor.as"
-#include "Actor1.as"
 #include "Utilities.as"
 
 #define SERVER_ONLY
