@@ -1,6 +1,7 @@
 #include "Entity1.as"
 #include "Entity2.as"
 #include "Actor1.as"
+#include "SpectatorActor.as"
 
 shared Entity@ getEntity(u8 type)
 {
@@ -12,6 +13,8 @@ shared Entity@ getEntity(u8 type)
 		return Entity2();
 	case EntityType::Actor1:
 		return Actor1();
+	case EntityType::SpectatorActor:
+		return SpectatorActor();
 	}
 	return null;
 }
@@ -20,5 +23,6 @@ shared enum EntityType
 {
 	Entity1,
 	Entity2,
-	Actor1
+	Actor1,
+	SpectatorActor
 }
