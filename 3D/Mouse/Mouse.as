@@ -5,7 +5,6 @@ shared class Mouse
 	private Vec2f velocity;
 
 	private bool wasInControl = false;
-	private bool enabled = false;
 
 	private CControls@ controls = getControls();
 	private Driver@ driver = getDriver();
@@ -35,17 +34,7 @@ shared class Mouse
 
 	bool isVisible()
 	{
-		return !enabled || Menu::getMainMenu() !is null || hud.hasMenus() || Engine::hasStandardGUIFocus() || !isWindowFocused();
-	}
-
-	bool isEnabled()
-	{
-		return enabled;
-	}
-
-	void SetEnabled(bool enabled)
-	{
-		this.enabled = enabled;
+		return Menu::getMainMenu() !is null || hud.hasMenus() || Engine::hasStandardGUIFocus() || !isWindowFocused();
 	}
 
 	void CalculateVelocity()
