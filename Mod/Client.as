@@ -14,20 +14,6 @@ void onRestart(CRules@ this)
 	@loadingManager = Loading::getManager();
 }
 
-void onTick(CRules@ this)
-{
-	CBlob@ myBlob = getLocalPlayerBlob();
-	if (myBlob is null) return;
-
-	if (myBlob.isKeyJustPressed(key_action3))
-	{
-		if (!loadingManager.isMyPlayerLoaded())
-		{
-			loadingManager.SetMyPlayerLoaded();
-		}
-	}
-}
-
 void onRender(CRules@ this)
 {
 	if (loadingManager is null) return;
