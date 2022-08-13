@@ -46,7 +46,7 @@ shared class LoadingManager
 		if (step is null)
 		{
 			// Set loaded the tick after the last step is complete
-			if (!isServer())
+			if (getLocalPlayer() !is null)
 			{
 				SetMyPlayerLoaded();
 			}

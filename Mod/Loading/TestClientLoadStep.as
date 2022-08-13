@@ -1,5 +1,4 @@
 #include "Loading.as"
-#include "LoadSteps.as"
 
 shared class TestClientLoadStep : ClientLoadStep
 {
