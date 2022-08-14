@@ -5,7 +5,7 @@ shared class MapSyncer
 	private Map@ map = Map::getMap();
 	private CRules@ rules = getRules();
 
-	private uint blocksPerPacket = 30;
+	private uint blocksPerPacket = 20000;
 
 	private u16 index = 0;
 	private CBitStream@[] clientPackets;
