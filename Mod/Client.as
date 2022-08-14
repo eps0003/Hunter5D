@@ -26,4 +26,19 @@ void Render(int id)
 	Render::ClearZ();
 
 	camera.Render();
+	mapRenderer.Render();
+
+	SColor col = color_white;
+	Vertex[] vertices = {
+		Vertex(-1,  1, 10, 0, 0, col),
+		Vertex( 1,  1, 10, 1, 0, col),
+		Vertex( 1, -1, 10, 1, 1, col),
+		Vertex(-1, -1, 10, 0, 1, col)
+	};
+
+	Render::SetBackfaceCull(false);
+	Render::SetAlphaBlend(true);
+	Render::RawQuads("pixel", vertices);
+	Render::SetAlphaBlend(false);
+	Render::SetBackfaceCull(true);
 }
