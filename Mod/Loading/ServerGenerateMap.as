@@ -25,6 +25,6 @@ shared class ServerGenerateMap : ServerLoadStep
 		complete = true;
 		print("Generated map!");
 
-		getRules().AddScript("MapHooks.as");
+		getRules().AddScript("MapHooksServer.as");
 	}
 }
