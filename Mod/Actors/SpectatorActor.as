@@ -1,6 +1,7 @@
 #include "Actor.as"
 #include "Interpolation.as"
 #include "Vec3f.as"
+#include "Camera.as"
 
 shared class SpectatorActor : Actor
 {
@@ -13,6 +14,7 @@ shared class SpectatorActor : Actor
 	private float moveSpeed = 0.2f;
 
 	private CControls@ controls = getControls();
+	private Camera@ camera = Camera::getCamera();
 
 	SpectatorActor(u16 id, CPlayer@ player, Vec3f position)
 	{
@@ -63,7 +65,14 @@ shared class SpectatorActor : Actor
 	{
 		if (player.isMyPlayer())
 		{
-			GUI::DrawText(position.toString(), Vec2f(10, 10), color_white);
+			float t = Interpolation::getFrameTime();
+			Vec3f pos = prevPosition.lerp(position, t);
+			Vec3f rot = prevRotation.lerp(rotation, t);
+
+			camera.position = pos;
+			camera.rotation = rot;
+
+			GUI::DrawText(pos.toString(), Vec2f(10, 10), color_white);
 		}
 	}
 
