@@ -63,7 +63,7 @@ shared class SpectatorActor : Actor
 	{
 		if (player.isMyPlayer())
 		{
-			GUI::DrawText(position.toString(), Vec2f(10, 100), color_white);
+			GUI::DrawText(position.toString(), Vec2f(10, 10), color_white);
 		}
 	}
 
