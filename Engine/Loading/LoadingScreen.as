@@ -14,6 +14,7 @@ const SColor BACKGROUND_COLOR(255, 165, 189, 200);
 void onInit(CRules@ this)
 {
 	onRestart(this);
+	Render::addScript(Render::layer_posthud, "LoadingScreen.as", "Render", 0);
 }
 
 void onRestart(CRules@ this)
@@ -21,23 +22,17 @@ void onRestart(CRules@ this)
 	@loadingManager = Loading::getManager();
 	@rules = this;
 	@driver = getDriver();
-
-	renderId = Render::addScript(Render::layer_posthud, "LoadingScreen.as", "Render", 0);
 }
 
 void onTick(CRules@ this)
 {
 	@step = loadingManager.getCurrentStep();
-
-	if (loadingManager.isMyPlayerLoaded())
-	{
-		Render::RemoveScript(renderId);
-		this.RemoveScript(getCurrentScriptName());
-	}
 }
 
 void Render(int id)
 {
+	if (loadingManager.isMyPlayerLoaded()) return;
+
 	Vec2f screenDim = driver.getScreenDimensions();
 	GUI::DrawRectangle(Vec2f_zero, screenDim, BACKGROUND_COLOR);
 
