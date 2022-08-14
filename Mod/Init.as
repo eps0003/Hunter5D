@@ -1,7 +1,7 @@
 #include "Loading.as"
-#include "TestClientLoadStep.as"
-#include "TestServerLoadStep.as"
+#include "Utilities.as"
 #include "ServerGenerateMap.as"
+#include "ClientReceiveMap.as"
 
 void onInit(CRules@ this)
 {
@@ -12,10 +12,5 @@ void onRestart(CRules@ this)
 {
 	LoadingManager@ loadingManager = Loading::getManager();
 	loadingManager.AddStep(ServerGenerateMap());
-	// loadingManager.AddStep(TestClientLoadStep("Client 1"));
-	// loadingManager.AddStep(TestServerLoadStep("Server 2"));
-	// loadingManager.AddStep(TestClientLoadStep("Client 3"));
-	// loadingManager.AddStep(TestServerLoadStep("Server 4"));
-	// loadingManager.AddStep(TestClientLoadStep("Client 5"));
-	// loadingManager.AddStep(TestServerLoadStep("Server 6"));
+	if (!isLocalHost()) loadingManager.AddStep(ClientReceiveMap());
 }

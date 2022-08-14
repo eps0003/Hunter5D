@@ -63,7 +63,7 @@ shared class LoadingManager
 		bool updateServer = isServer() && serverStep !is null;
 		if (updateClient || updateServer)
 		{
-			step.Update();
+			step.Load();
 
 			if (step.isComplete())
 			{

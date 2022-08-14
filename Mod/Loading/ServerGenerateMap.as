@@ -8,7 +8,7 @@ shared class ServerGenerateMap : ServerLoadStep
 		super("Generating map...");
 	}
 
-	void Update()
+	void Load()
 	{
 		Map@ map = Map::getMap();
 		map.Initialize(Vec3f(24, 8, 24));
