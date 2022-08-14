@@ -12,6 +12,7 @@ shared class LoadingManager
 	LoadingManager()
 	{
 		rules.set_u8("server load index", 0);
+		rules.Sync("server load index", true);
 	}
 
 	void AddStep(LoadStep@ step)
