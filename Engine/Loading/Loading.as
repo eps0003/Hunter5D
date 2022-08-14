@@ -3,21 +3,15 @@
 
 shared class LoadingManager
 {
-	private CPlayer@[] loadedPlayers;
 	private LoadStep@[] loadSteps;
 	private u8 index = 0;
+	private dictionary loadedPlayers;
 
 	private CRules@ rules = getRules();
 
-	~LoadingManager()
+	LoadingManager()
 	{
-		for (uint i = 0; i < getPlayerCount(); i++)
-		{
-			CPlayer@ player = getPlayer(i);
-			if (player is null) continue;
-
-			rules.set_bool("_loaded" + player.getUsername(), false);
-		}
+		rules.set_u8("server load index", 0);
 	}
 
 	void AddStep(LoadStep@ step)
@@ -137,7 +131,7 @@ shared class LoadingManager
 
 	bool isPlayerLoaded(CPlayer@ player)
 	{
-		return player !is null && rules.get_bool("_loaded" + player.getUsername());
+		return player !is null && loadedPlayers.exists(player.getUsername());
 	}
 
 	bool isMyPlayerLoaded()
@@ -154,7 +148,7 @@ shared class LoadingManager
 			return;
 		}
 
-		rules.set_bool("_loaded" + player.getUsername(), true);
+		loadedPlayers.set(player.getUsername(), true);
 
 		if (isServer())
 		{
@@ -183,7 +177,7 @@ shared class LoadingManager
 			return;
 		}
 
-		rules.set_bool("_loaded" + player.getUsername(), false);
+		loadedPlayers.delete(player.getUsername());
 	}
 
 	bool areAllPlayersLoaded()
