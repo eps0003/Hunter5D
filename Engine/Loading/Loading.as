@@ -176,7 +176,7 @@ shared class LoadingManager
 
 	void RemoveLoadedPlayer(CPlayer@ player)
 	{
-		if (isPlayerLoaded(player))
+		if (!isPlayerLoaded(player))
 		{
 			error("Attempted to remove loaded player who isn't loaded: " + player.getUsername());
 			printTrace();
