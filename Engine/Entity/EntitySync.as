@@ -52,7 +52,10 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 void onPlayerLeave(CRules@ this, CPlayer@ player)
 {
-	entityManager.RemoveActor(player);
+	if (isServer())
+	{
+		entityManager.RemoveActor(player);
+	}
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
