@@ -3,8 +3,6 @@
 
 shared class ServerGenerateMap : ServerLoadStep
 {
-	Map@ map = Map::getMap();
-
 	ServerGenerateMap()
 	{
 		super("Generating map...");
@@ -12,6 +10,7 @@ shared class ServerGenerateMap : ServerLoadStep
 
 	void Update()
 	{
+		Map@ map = Map::getMap();
 		map.Initialize(Vec3f(24, 8, 24));
 
 		for (uint x = 0; x < map.dimensions.x; x++)
@@ -25,5 +24,7 @@ shared class ServerGenerateMap : ServerLoadStep
 
 		complete = true;
 		print("Generated map!");
+
+		getRules().AddScript("MapHooks.as");
 	}
 }
