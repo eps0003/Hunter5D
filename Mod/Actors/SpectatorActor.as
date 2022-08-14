@@ -2,6 +2,7 @@
 #include "Interpolation.as"
 #include "Vec3f.as"
 #include "Camera.as"
+#include "Mouse.as"
 
 shared class SpectatorActor : Actor
 {
@@ -15,6 +16,7 @@ shared class SpectatorActor : Actor
 
 	private CControls@ controls = getControls();
 	private Camera@ camera = Camera::getCamera();
+	private Mouse@ mouse = Mouse::getMouse();
 
 	SpectatorActor(u16 id, CPlayer@ player, Vec3f position)
 	{
@@ -38,6 +40,7 @@ shared class SpectatorActor : Actor
 	{
 		if (player.isMyPlayer())
 		{
+			// Movement
 			Vec2f dir;
 			s8 verticalDir = 0;
 
@@ -58,6 +61,12 @@ shared class SpectatorActor : Actor
 			position.x += dir.x * moveSpeed;
 			position.z += dir.y * moveSpeed;
 			position.y += verticalDir * moveSpeed;
+
+			// Rotation
+			Vec2f mouseVel = mouse.getVelocity();
+			rotation += Vec3f(mouseVel.y, mouseVel.x, 0);
+			rotation.x = Maths::Clamp(rotation.x, -90, 90);
+			rotation.z = Maths::Clamp(rotation.z, -90, 90);
 		}
 	}
 
