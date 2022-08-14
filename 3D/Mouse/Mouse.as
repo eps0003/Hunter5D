@@ -1,3 +1,4 @@
+#include "Loading.as"
 #include "Config.as"
 
 shared class Mouse
@@ -9,6 +10,7 @@ shared class Mouse
 	private CControls@ controls = getControls();
 	private Driver@ driver = getDriver();
 	private CHUD@ hud = getHUD();
+	private LoadingManager@ loadingManager = Loading::getManager();
 	private ConfigFile@ cfg = Config::getConfig();
 
 	Vec2f getVelocity()
@@ -29,7 +31,7 @@ shared class Mouse
 
 	bool isInControl()
 	{
-		return !isVisible();
+		return !isVisible() && loadingManager.isMyPlayerLoaded();
 	}
 
 	bool isVisible()
