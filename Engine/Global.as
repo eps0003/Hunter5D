@@ -19,4 +19,5 @@ void onRestart(CRules@ this)
 	// TODO: Move 3D-specific resets out of engine
 	this.set("map", null);
 	this.set("map syncer", null);
+	this.set("map renderer", null);
 }

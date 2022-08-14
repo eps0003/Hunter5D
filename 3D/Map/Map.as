@@ -1,5 +1,6 @@
 #include "Vec3f.as"
 #include "MapSyncer.as"
+#include "MapRenderer.as"
 
 shared class Map
 {
@@ -281,5 +282,16 @@ namespace Map
 			getRules().set("map syncer", @syncer);
 		}
 		return syncer;
+	}
+
+	shared MapRenderer@ getRenderer()
+	{
+		MapRenderer@ renderer;
+		if (!getRules().get("map renderer", @renderer))
+		{
+			@renderer = MapRenderer();
+			getRules().set("map renderer", @renderer);
+		}
+		return renderer;
 	}
 }
