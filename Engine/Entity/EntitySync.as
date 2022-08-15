@@ -7,7 +7,6 @@ void onInit(CRules@ this)
 {
 	this.addCommandID("create entity");
 	this.addCommandID("sync entity");
-	this.addCommandID("sync actor");
 	this.addCommandID("remove entity");
 
 	onRestart(this);
@@ -79,10 +78,6 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	else if (!isServer() && cmd == this.getCommandID("sync entity"))
 	{
 		entityManager.DeserializeEntity(params);
-	}
-	else if (cmd == this.getCommandID("sync actor"))
-	{
-		entityManager.DeserializeActor(params);
 	}
 	else if (!isServer() && cmd == this.getCommandID("remove entity"))
 	{

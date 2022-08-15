@@ -4,6 +4,7 @@
 shared class EntityManager
 {
 	private Entity@[] entities;
+	private dictionary packets;
 
 	private CRules@ rules = getRules();
 
@@ -109,10 +110,8 @@ shared class EntityManager
 		}
 
 		entities.removeAt(index);
+		packets.delete("" + id);
 		print("Removed entity: " + id);
-
-		string key = "_entity" + id;
-		rules.set(key, null);
 	}
 
 	Entity@ getEntity(u16 id)
@@ -174,37 +173,21 @@ shared class EntityManager
 			{
 				CBitStream bs;
 				actor.SerializeTickClient(bs);
-				rules.SendCommand(rules.getCommandID("sync actor"), bs, true);
+				rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
 			}
 		}
 	}
 
 	void DeserializeEntity(CBitStream@ bs)
 	{
-		uint index = bs.getBitIndex();
+		CBitStream bs2;
+		bs2.writeBitStream(bs, bs.getBitIndex(), bs.getBitsUsed() - bs.getBitIndex());
+		bs2.ResetBitIndex();
 
 		u16 id;
 		if (!bs.saferead_u16(id)) return;
 
-		string key = "_entity" + id;
-
-		bs.SetBitIndex(index);
-		rules.set(key, bs);
-		rules.set_u32(key + "index", index);
-	}
-
-	void DeserializeActor(CBitStream@ bs)
-	{
-		uint index = bs.getBitIndex();
-
-		u16 id;
-		if (!bs.saferead_u16(id)) return;
-
-		string key = "_actor" + id;
-
-		bs.SetBitIndex(index);
-		rules.set(key, bs);
-		rules.set_u32(key + "index", index);
+		packets.set("" + id, bs2);
 	}
 
 	void UpdateEntities()
@@ -220,12 +203,10 @@ shared class EntityManager
 
 			if (!isServer())
 			{
-				string key = "_entity" + entity.getId();
-
-				CBitStream bs;
-				if (rules.get(key, bs))
+				CBitStream@ bs;
+				if (packets.get("" + entity.getId(), @bs))
 				{
-					bs.SetBitIndex(rules.get_u32(key + "index"));
+					bs.ResetBitIndex();
 					entity.deserializeTick(bs);
 				}
 			}
@@ -233,12 +214,10 @@ shared class EntityManager
 			Actor@ actor = cast<Actor>(entity);
 			if (actor !is null && !actor.getPlayer().isMyPlayer())
 			{
-				string key = "_actor" + actor.getId();
-
-				CBitStream bs;
-				if (rules.get(key, bs))
+				CBitStream@ bs;
+				if (packets.get("" + actor.getId(), @bs))
 				{
-					bs.SetBitIndex(rules.get_u32(key + "index"));
+					bs.ResetBitIndex();
 					actor.deserializeTickClient(bs);
 				}
 			}
