@@ -18,24 +18,20 @@ shared class MapRenderer
 	private float shadeIntensity = 0.07f;
 	private u8[] shadeScale = { 2, 3, 5, 0, 1, 4 };
 
-	MapRenderer()
+	void Initialize()
 	{
-		InitMaterial();
+		Texture::createFromFile("pixel", "Pixel.png");
+		material.AddTexture("pixel");
+
+		material.SetFlag(SMaterial::LIGHTING, false);
+		material.SetFlag(SMaterial::BILINEAR_FILTER, false);
+		material.SetFlag(SMaterial::FOG_ENABLE, true);
+		material.SetMaterialType(SMaterial::TRANSPARENT_ALPHA_CHANNEL_REF);
 
 		faceFlags.set_length(map.blockCount);
 
 		chunkDimensions = (map.dimensions / chunkDimension).ceil();
 		chunks.set_length(chunkDimensions.x * chunkDimensions.y * chunkDimensions.z);
-	}
-
-	private void InitMaterial()
-	{
-		Texture::createFromFile("pixel", "Pixel.png");
-		material.AddTexture("pixel");
-		material.SetFlag(SMaterial::LIGHTING, false);
-		material.SetFlag(SMaterial::BILINEAR_FILTER, false);
-		material.SetFlag(SMaterial::FOG_ENABLE, true);
-		material.SetMaterialType(SMaterial::TRANSPARENT_ALPHA_CHANNEL_REF);
 	}
 
 	void GenerateMesh(int index)

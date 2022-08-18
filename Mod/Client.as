@@ -26,7 +26,7 @@ void Render(int id)
 	Render::ClearZ();
 
 	camera.Render();
-	mapRenderer.Render();
+	// mapRenderer.Render();
 
 	SColor col = color_white;
 	Vertex[] vertices = {
