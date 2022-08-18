@@ -24,11 +24,6 @@ shared bool isTickPaused()
 	return isLocalHost() && Menu::getMainMenu() !is null;
 }
 
-shared int getFPS()
-{
-	return getRules().get_u32("fps");
-}
-
 shared string trimFileExtension(string fileName)
 {
 	return fileName.substr(0, fileName.findLast("."));
