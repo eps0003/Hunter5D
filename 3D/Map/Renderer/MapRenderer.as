@@ -12,6 +12,7 @@ shared class MapRenderer
 
 	u8 chunkDimension = 16;
 	Vec3f chunkDimensions;
+	uint chunkCount = 0;
 
 	SMaterial@ material = SMaterial();
 
@@ -31,7 +32,8 @@ shared class MapRenderer
 		faceFlags.set_length(map.blockCount);
 
 		chunkDimensions = (map.dimensions / chunkDimension).ceil();
-		chunks.set_length(chunkDimensions.x * chunkDimensions.y * chunkDimensions.z);
+		chunkCount = chunkDimensions.x * chunkDimensions.y * chunkDimensions.z;
+		chunks.set_length(chunkCount);
 	}
 
 	void GenerateMesh(int index)
