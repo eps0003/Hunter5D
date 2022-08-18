@@ -2,6 +2,13 @@
 
 shared class ClientInitBlockFaces : ClientLoadStep
 {
+	uint loadRate = 20000;
+
+	uint x = 0;
+	uint y = 0;
+	uint z = 0;
+	uint index = 0;
+
 	Map@ map = Map::getMap();
 	MapRenderer@ mapRenderer = Map::getRenderer();
 
@@ -14,15 +21,34 @@ shared class ClientInitBlockFaces : ClientLoadStep
 	{
 		mapRenderer.Initialize();
 
-		uint index = 0;
+		uint blocksThisTick = Maths::Ceil(loadRate / getRenderSmoothDeltaTime());
 
-		for (uint y = 0; y < map.dimensions.y; y++)
-		for (uint z = 0; z < map.dimensions.z; z++)
-		for (uint x = 0; x < map.dimensions.x; x++)
+		uint count = 0;
+
+		progress = index / float(map.blockCount);
+
+		for (; y < map.dimensions.y; y++)
 		{
-			mapRenderer.InitBlockFaces(index++, x, y, z);
-		}
+			for (; z < map.dimensions.z; z++)
+			{
+				for (; x < map.dimensions.x; x++)
+				{
+					mapRenderer.InitBlockFaces(index, x, y, z);
 
-		complete = true;
+					if (++index >= map.blockCount)
+					{
+						complete = true;
+						print("Initialized block faces!");
+						return;
+					}
+					else if (++count >= blocksThisTick)
+					{
+						return;
+					}
+				}
+				x = 0;
+			}
+			z = 0;
+		}
 	}
 }

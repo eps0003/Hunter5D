@@ -18,5 +18,10 @@ shared class ClientReceiveMap : ClientLoadStep
 
 		progress = mapSyncer.getProgress(player);
 		complete = mapSyncer.isSynced(player);
+
+		if (complete)
+		{
+			print("Received map!");
+		}
 	}
 }
