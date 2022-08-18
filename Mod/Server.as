@@ -3,7 +3,7 @@
 
 #define SERVER_ONLY
 
-const Vec3f SPAWN_POSITION = Vec3f(10, 0, 0);
+const Vec3f SPAWN_POSITION = Vec3f(4, 4, 4);
 
 EntityManager@ entityManager;
 

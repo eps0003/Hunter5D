@@ -6,17 +6,17 @@
 Camera@ camera;
 MapRenderer@ mapRenderer;
 
+void onRestart(CRules@ this)
+{
+	this.RemoveScript(getCurrentScriptName());
+}
+
 void onInit(CRules@ this)
 {
 	@camera = Camera::getCamera();
 	@mapRenderer = Map::getRenderer();
 
 	Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
-}
-
-void onRestart(CRules@ this)
-{
-	this.RemoveScript(getCurrentScriptName());
 }
 
 void Render(int id)
