@@ -43,6 +43,7 @@ shared class Map
 
 	void ClientSetBlock(Vec3f position, SColor block)
 	{
+		position = position.floor();
 		ClientSetBlock(position.x, position.y, position.z, block);
 	}
 
@@ -85,6 +86,7 @@ shared class Map
 
 	void SetBlock(Vec3f position, SColor block, CPlayer@ player = null)
 	{
+		position = position.floor();
 		SetBlock(position.x, position.y, position.z, block, player);
 	}
 
@@ -135,6 +137,7 @@ shared class Map
 
 	void DamageBlock(Vec3f position, uint damage, CPlayer@ player = null)
 	{
+		position = position.floor();
 		DamageBlock(position.x, position.y, position.z, damage, player);
 	}
 
@@ -178,6 +181,7 @@ shared class Map
 
 	SColor getBlock(Vec3f position)
 	{
+		position = position.floor();
 		return getBlock(position.x, position.y, position.z);
 	}
 
@@ -222,6 +226,7 @@ shared class Map
 	//https://coderwall.com/p/fzni3g/bidirectional-translation-between-1d-and-3d-arrays
 	int posToIndex(Vec3f position)
 	{
+		position = position.floor();
 		return posToIndex(position.x, position.y, position.z);
 	}
 
