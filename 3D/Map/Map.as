@@ -249,11 +249,6 @@ shared class Map
 		return block.getAlpha() > 0;
 	}
 
-	bool isSolid(SColor block)
-	{
-		return isVisible(block);
-	}
-
 	bool isDestructible(SColor block)
 	{
 		return isVisible(block);

@@ -3,6 +3,7 @@
 #include "Vec3f.as"
 #include "Camera.as"
 #include "Mouse.as"
+#include "Ray.as"
 
 shared class SpectatorActor : Actor
 {
@@ -17,6 +18,7 @@ shared class SpectatorActor : Actor
 	private CControls@ controls = getControls();
 	private Camera@ camera = Camera::getCamera();
 	private Mouse@ mouse = Mouse::getMouse();
+	private Map@ map = Map::getMap();
 
 	SpectatorActor(u16 id, CPlayer@ player, Vec3f position)
 	{
@@ -68,6 +70,23 @@ shared class SpectatorActor : Actor
 			rotation.x = Maths::Clamp(rotation.x, -90, 90);
 			rotation.z = Maths::Clamp(rotation.z, -90, 90);
 			rotation.y = (rotation.y + 360.0f) % 360.0f;
+
+			// Block placement
+			if (player.getBlob().isKeyJustPressed(key_action1))
+			{
+				Ray ray(position, rotation.dir());
+				RaycastInfo@ raycastInfo;
+				if (ray.raycastBlock(10, @raycastInfo))
+				{
+					Vec3f blockPos = raycastInfo.hitWorldPos + raycastInfo.normal;
+					if (map.isValidBlock(blockPos) && !map.isVisible(map.getBlock(blockPos)))
+					{
+						SColor block = SColor(255, 255, 100, 100);
+						map.ClientSetBlock(blockPos, block);
+						print("Placed block at " + blockPos.toString());
+					}
+				}
+			}
 		}
 	}
 
