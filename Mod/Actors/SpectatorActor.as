@@ -67,6 +67,7 @@ shared class SpectatorActor : Actor
 			rotation += Vec3f(mouseVel.y, mouseVel.x, 0);
 			rotation.x = Maths::Clamp(rotation.x, -90, 90);
 			rotation.z = Maths::Clamp(rotation.z, -90, 90);
+			rotation.y = (rotation.y + 360.0f) % 360.0f;
 		}
 	}
 
@@ -76,7 +77,7 @@ shared class SpectatorActor : Actor
 		{
 			float t = Interpolation::getFrameTime();
 			Vec3f pos = prevPosition.lerp(position, t);
-			Vec3f rot = prevRotation.lerp(rotation, t);
+			Vec3f rot = prevRotation.lerpAngle(rotation, t);
 
 			camera.position = pos;
 			camera.rotation = rot;
