@@ -17,10 +17,13 @@ shared class ClientInitBlockFaces : ClientLoadStep
 		super("Initializing block faces...");
 	}
 
-	void Load()
+	void Init()
 	{
 		mapRenderer.Initialize();
+	}
 
+	void Load()
+	{
 		uint blocksThisTick = Maths::Ceil(loadRate / getRenderSmoothDeltaTime());
 
 		uint count = 0;

@@ -27,6 +27,11 @@ shared class LoadStep
 		return complete;
 	}
 
+	void Init()
+	{
+
+	}
+
 	void Load()
 	{
 

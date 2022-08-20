@@ -6,6 +6,7 @@ shared class LoadingManager
 	private LoadStep@[] loadSteps;
 	private u8 index = 0;
 	private dictionary loadedPlayers;
+	private LoadStep@ prevStep;
 
 	private CRules@ rules = getRules();
 
@@ -58,6 +59,11 @@ shared class LoadingManager
 		bool updateServer = isServer() && serverStep !is null;
 		if (updateClient || updateServer)
 		{
+			if (prevStep !is step)
+			{
+				step.Init();
+			}
+
 			step.Load();
 
 			if (step.isComplete())
@@ -79,6 +85,8 @@ shared class LoadingManager
 			rules.set_u8("server load index", index);
 			rules.Sync("server load index", true);
 		}
+
+		@prevStep = step;
 	}
 
 	private void SkipSteps()
