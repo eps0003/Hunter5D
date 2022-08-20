@@ -24,7 +24,7 @@ shared class ClientInitBlockFaces : ClientLoadStep
 
 	void Load()
 	{
-		uint blocksThisTick = Maths::Ceil(loadRate / getRenderSmoothDeltaTime());
+		uint blocksThisTick = getFPS() * loadRate;
 
 		uint count = 0;
 
