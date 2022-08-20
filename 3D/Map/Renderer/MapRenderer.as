@@ -19,7 +19,7 @@ shared class MapRenderer
 	private float shadeIntensity = 0.07f;
 	private u8[] shadeScale = { 2, 3, 5, 0, 1, 4 };
 
-	void Initialize()
+	void Init()
 	{
 		Texture::createFromFile("pixel", "Pixel.png");
 		material.AddTexture("pixel");

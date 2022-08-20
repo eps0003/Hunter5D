@@ -1,9 +1,12 @@
 #include "Loading.as"
 #include "Map.as"
+#include "MapGenerator.as"
 
 shared class ServerGenerateMap : ServerLoadStep
 {
 	uint blocksPerTick = 20000;
+
+	MapGenerator@ generator;
 
 	uint x = 0;
 	uint y = 0;
@@ -12,14 +15,15 @@ shared class ServerGenerateMap : ServerLoadStep
 
 	Map@ map = Map::getMap();
 
-	ServerGenerateMap()
+	ServerGenerateMap(MapGenerator@ generator)
 	{
 		super("Generating map...");
+		@this.generator = generator;
 	}
 
 	void Init()
 	{
-		map.Initialize(Vec3f(24, 8, 24));
+		map.Init(generator.getDimensions());
 	}
 
 	void Load()
@@ -34,22 +38,12 @@ shared class ServerGenerateMap : ServerLoadStep
 			{
 				for (; x < map.dimensions.x; x++)
 				{
-					if (y == 0)
-					{
-						SColor color = (x + z) % 2 == 0
-							? SColor(255, 100, 100, 100)
-							: SColor(255, 150, 150, 150);
-						map.SetBlock(x, y, z, color);
-					}
+					SColor color = generator.generateBlock(x, y, z);
+					map.SetBlock(x, y, z, color);
 
-					if (++index >= map.blockCount)
-					{
-						complete = true;
-						print("Generated map!");
-						getRules().AddScript("MapHooksServer.as");
-						return;
-					}
-					else if (++count >= blocksPerTick)
+					index++;
+
+					if (++count >= blocksPerTick)
 					{
 						return;
 					}
@@ -58,5 +52,9 @@ shared class ServerGenerateMap : ServerLoadStep
 			}
 			z = 0;
 		}
+
+		complete = true;
+		print("Generated map!");
+		getRules().AddScript("MapHooksServer.as");
 	}
 }

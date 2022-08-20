@@ -32,7 +32,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		Vec3f dimensions;
 		if (!dimensions.deserialize(params)) return;
 
-		map.Initialize(dimensions);
+		map.Init(dimensions);
 	}
 	else if (!isServer() && cmd == this.getCommandID("sync map"))
 	{

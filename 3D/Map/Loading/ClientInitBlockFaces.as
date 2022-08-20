@@ -19,7 +19,7 @@ shared class ClientInitBlockFaces : ClientLoadStep
 
 	void Init()
 	{
-		mapRenderer.Initialize();
+		mapRenderer.Init();
 	}
 
 	void Load()
@@ -38,13 +38,9 @@ shared class ClientInitBlockFaces : ClientLoadStep
 				{
 					mapRenderer.InitBlockFaces(index, x, y, z);
 
-					if (++index >= map.blockCount)
-					{
-						complete = true;
-						print("Initialized block faces!");
-						return;
-					}
-					else if (++count >= blocksThisTick)
+					index++;
+
+					if (++count >= blocksThisTick)
 					{
 						return;
 					}
@@ -53,5 +49,8 @@ shared class ClientInitBlockFaces : ClientLoadStep
 			}
 			z = 0;
 		}
+
+		complete = true;
+		print("Initialized block faces!");
 	}
 }

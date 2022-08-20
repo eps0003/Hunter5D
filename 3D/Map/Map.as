@@ -10,7 +10,7 @@ shared class Map
 
 	private CRules@ rules = getRules();
 
-	void Initialize(Vec3f dimensions)
+	void Init(Vec3f dimensions)
 	{
 		this.dimensions = dimensions;
 		blockCount = dimensions.x * dimensions.y * dimensions.z;
