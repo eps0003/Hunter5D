@@ -14,13 +14,11 @@ shared class Camera
 	private float[] projectionMatrix;
 	private float[] rotationMatrix;
 
-	private Driver@ driver;
+	private Driver@ driver = getDriver();
 	private ConfigFile@ cfg = Config::getConfig();
 
 	Camera()
 	{
-		@driver = getDriver();
-
 		Matrix::MakeIdentity(modelMatrix);
 		Matrix::MakeIdentity(viewMatrix);
 		Matrix::MakeIdentity(projectionMatrix);
@@ -68,7 +66,7 @@ shared class Camera
 
 	float getFOV()
 	{
-		return cfg.read_f32("fov", 70.0f);;
+		return cfg.read_f32("fov", 70.0f);
 	}
 
 	void SetFOV(float fov)
@@ -81,7 +79,7 @@ shared class Camera
 
 	float getRenderDistance()
 	{
-		return cfg.read_f32("render_distance", 80.0f);;
+		return cfg.read_f32("render_distance", 80.0f);
 	}
 
 	void SetRenderDistance(float distance)
