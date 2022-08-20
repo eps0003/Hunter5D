@@ -57,12 +57,12 @@ shared class Chunk
 		vertices.clear();
 		indices.clear();
 
-		Vec3f startWorldPos = position * renderer.chunkDimension;
-		Vec3f endWorldPos = (startWorldPos + renderer.chunkDimension).min(map.dimensions);
+		Vec3f startWorldPos = position * renderer.chunkSize;
+		Vec3f endWorldPos = (startWorldPos + renderer.chunkSize).min(map.dimensions);
 
-		for (uint x = startWorldPos.x; x < endWorldPos.x; x++)
 		for (uint y = startWorldPos.y; y < endWorldPos.y; y++)
 		for (uint z = startWorldPos.z; z < endWorldPos.z; z++)
+		for (uint x = startWorldPos.x; x < endWorldPos.x; x++)
 		{
 			int index = renderer.map.posToIndex(x, y, z);
 

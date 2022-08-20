@@ -10,7 +10,9 @@ shared class MapRenderer
 	private Chunk@[] chunks;
 	private u8[] faceFlags;
 
-	u8 chunkDimension = 12;
+	// Chunk size cannot be larger than 15 due to the u16 index buffer limit
+	// Chunks won't render property at larger chunk sizes on a checkboard map
+	u8 chunkSize = 12;
 	Vec3f chunkDimensions;
 	uint chunkCount = 0;
 
@@ -31,7 +33,7 @@ shared class MapRenderer
 
 		faceFlags.set_length(map.blockCount);
 
-		chunkDimensions = (map.dimensions / chunkDimension).ceil();
+		chunkDimensions = (map.dimensions / chunkSize).ceil();
 		chunkCount = chunkDimensions.x * chunkDimensions.y * chunkDimensions.z;
 		chunks.set_length(chunkCount);
 	}
@@ -64,9 +66,9 @@ shared class MapRenderer
 			int cy = chunkPos.y;
 			int cz = chunkPos.z;
 
-			int xMod = x % chunkDimension;
-			int yMod = y % chunkDimension;
-			int zMod = z % chunkDimension;
+			int xMod = x % chunkSize;
+			int yMod = y % chunkSize;
+			int zMod = z % chunkSize;
 
 			UpdateBlockFaces(index, x, y, z);
 
@@ -132,7 +134,7 @@ shared class MapRenderer
 				if (chunk !is null) chunk.Rebuild();
 			}
 
-			if (xMod == chunkDimension - 1)
+			if (xMod == chunkSize - 1)
 			{
 				@chunk = getChunkSafe(cx + 1, cy, cz);
 				if (chunk !is null) chunk.Rebuild();
@@ -144,7 +146,7 @@ shared class MapRenderer
 				if (chunk !is null) chunk.Rebuild();
 			}
 
-			if (yMod == chunkDimension - 1)
+			if (yMod == chunkSize - 1)
 			{
 				@chunk = getChunkSafe(cx, cy + 1, cz);
 				if (chunk !is null) chunk.Rebuild();
@@ -156,7 +158,7 @@ shared class MapRenderer
 				if (chunk !is null) chunk.Rebuild();
 			}
 
-			if (zMod == chunkDimension - 1)
+			if (zMod == chunkSize - 1)
 			{
 				@chunk = getChunkSafe(cx, cy, cz + 1);
 				if (chunk !is null) chunk.Rebuild();
@@ -332,7 +334,7 @@ shared class MapRenderer
 
 	Vec3f worldPosToChunkPos(Vec3f position)
 	{
-		return position / chunkDimension;
+		return position / chunkSize;
 	}
 
 	Vec3f worldPosToChunkPos(float x, float y, float z)

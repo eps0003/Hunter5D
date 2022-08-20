@@ -14,7 +14,7 @@ void onInit(CRules@ this)
 void onRestart(CRules@ this)
 {
 	LoadingManager@ loadingManager = Loading::getManager();
-	loadingManager.AddStep(ServerGenerateMap(TestMapGenerator(64, 32, 64)));
+	loadingManager.AddStep(ServerGenerateMap(TestMapGenerator(256, 64, 256)));
 	if (!isLocalHost()) loadingManager.AddStep(ClientReceiveMap());
 	loadingManager.AddStep(ClientInitBlockFaces());
 	loadingManager.AddStep(ClientGenerateChunks());
