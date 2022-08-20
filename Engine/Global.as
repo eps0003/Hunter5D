@@ -13,6 +13,8 @@ void onInit(CRules@ this)
 
 void onRestart(CRules@ this)
 {
+	this.set("mouse", null);
+
 	this.set("entity manager", null);
 	this.set("loading manager", null);
 
