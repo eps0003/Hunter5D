@@ -4,7 +4,7 @@
 
 shared class ServerGenerateMap : ServerLoadStep
 {
-	uint blocksPerTick = 20000;
+	uint blocksPerTick = 10000;
 
 	MapGenerator@ generator;
 

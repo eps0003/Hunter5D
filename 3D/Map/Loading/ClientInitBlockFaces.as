@@ -2,7 +2,7 @@
 
 shared class ClientInitBlockFaces : ClientLoadStep
 {
-	uint loadRate = 20000;
+	uint loadRate = 100;
 
 	uint x = 0;
 	uint y = 0;
