@@ -1,4 +1,4 @@
-#include "SpectatorActor.as"
+#include "PhysicalActor.as"
 #include "Utilities.as"
 
 #define SERVER_ONLY
@@ -33,5 +33,5 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 void SpawnPlayer(CPlayer@ player, Vec3f position)
 {
-	entityManager.AddEntity(SpectatorActor(getUniqueId(), player, position));
+	entityManager.AddEntity(PhysicalActor(getUniqueId(), player, position));
 }

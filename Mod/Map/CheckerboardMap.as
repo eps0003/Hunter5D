@@ -1,8 +1,8 @@
 #include "MapGenerator.as"
 
-shared class TestMapGenerator : MapGenerator
+shared class CheckerboardMap : MapGenerator
 {
-	TestMapGenerator(uint x, uint y, uint z)
+	CheckerboardMap(uint x, uint y, uint z)
 	{
 		super(x, y, z);
 	}

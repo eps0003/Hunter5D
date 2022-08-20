@@ -52,6 +52,8 @@ shared class EntityManager
 		entities.push_back(entity);
 		print("Added entity: " + id);
 
+		entity.Init();
+
 		if (isServer())
 		{
 			CBitStream bs;
