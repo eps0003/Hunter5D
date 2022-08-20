@@ -2,6 +2,10 @@
 
 shared class ClientGenerateChunks : ClientLoadStep
 {
+	float loadRate = 0.01f;
+
+	uint index = 0;
+
 	MapRenderer@ mapRenderer = Map::getRenderer();
 	CRules@ rules = getRules();
 
@@ -12,9 +16,21 @@ shared class ClientGenerateChunks : ClientLoadStep
 
 	void Load()
 	{
-		for (uint i = 0; i < mapRenderer.chunkCount; i++)
+		uint chunksThisTick = Maths::Ceil(getFPS() * loadRate);
+		uint count = 0;
+
+		progress = index / float(mapRenderer.chunkCount);
+
+		while (index < mapRenderer.chunkCount)
 		{
-			mapRenderer.SetChunk(i, Chunk(mapRenderer, i));
+			if (++count > chunksThisTick)
+			{
+				return;
+			}
+
+			mapRenderer.SetChunk(index, Chunk(mapRenderer, index));
+
+			index++;
 		}
 
 		complete = true;

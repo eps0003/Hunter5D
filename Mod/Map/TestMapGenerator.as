@@ -9,9 +9,8 @@ shared class TestMapGenerator : MapGenerator
 
 	SColor generateBlock(int x, int y, int z)
 	{
-		if (y != 0) return 0;
-		return (x + z) % 2 == 0
+		return (x + y + z) % 2 == 0
 			? SColor(255, 100, 100, 100)
-			: SColor(255, 150, 150, 150);
+			: 0;
 	}
 }

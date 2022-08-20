@@ -10,7 +10,7 @@ shared class MapRenderer
 	private Chunk@[] chunks;
 	private u8[] faceFlags;
 
-	u8 chunkDimension = 16;
+	u8 chunkDimension = 12;
 	Vec3f chunkDimensions;
 	uint chunkCount = 0;
 

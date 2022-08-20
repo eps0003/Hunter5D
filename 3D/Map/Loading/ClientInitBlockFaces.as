@@ -2,7 +2,7 @@
 
 shared class ClientInitBlockFaces : ClientLoadStep
 {
-	uint loadRate = 100;
+	float loadRate = 100.0f;
 
 	uint x = 0;
 	uint y = 0;
@@ -24,8 +24,7 @@ shared class ClientInitBlockFaces : ClientLoadStep
 
 	void Load()
 	{
-		uint blocksThisTick = getFPS() * loadRate;
-
+		uint blocksThisTick = Maths::Ceil(getFPS() * loadRate);
 		uint count = 0;
 
 		progress = index / float(map.blockCount);
@@ -36,14 +35,14 @@ shared class ClientInitBlockFaces : ClientLoadStep
 			{
 				for (; x < map.dimensions.x; x++)
 				{
-					mapRenderer.InitBlockFaces(index, x, y, z);
-
-					index++;
-
-					if (++count >= blocksThisTick)
+					if (++count > blocksThisTick)
 					{
 						return;
 					}
+
+					mapRenderer.InitBlockFaces(index, x, y, z);
+
+					index++;
 				}
 				x = 0;
 			}

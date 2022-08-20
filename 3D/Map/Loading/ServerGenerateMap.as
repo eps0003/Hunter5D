@@ -38,15 +38,15 @@ shared class ServerGenerateMap : ServerLoadStep
 			{
 				for (; x < map.dimensions.x; x++)
 				{
+					if (++count > blocksPerTick)
+					{
+						return;
+					}
+
 					SColor color = generator.generateBlock(x, y, z);
 					map.SetBlock(x, y, z, color);
 
 					index++;
-
-					if (++count >= blocksPerTick)
-					{
-						return;
-					}
 				}
 				x = 0;
 			}
