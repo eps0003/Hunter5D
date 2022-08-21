@@ -146,7 +146,8 @@ shared class PhysicalActor : Actor, Collision
 
 	private void BlockPlacement()
 	{
-		if (player.getBlob().isKeyJustPressed(key_action1))
+		CBlob@ blob = player.getBlob();
+		if (blob !is null && blob.isKeyJustPressed(key_action1))
 		{
 			Ray ray(position, rotation.dir());
 			RaycastInfo@ raycastInfo;

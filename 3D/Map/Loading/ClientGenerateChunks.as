@@ -35,7 +35,5 @@ shared class ClientGenerateChunks : ClientLoadStep
 
 		complete = true;
 		print("Generated chunks!");
-
-		rules.AddScript("Client.as");
 	}
 }

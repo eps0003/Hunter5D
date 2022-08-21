@@ -7,12 +7,12 @@ const Vec3f SPAWN_POSITION = Vec3f(4, 4, 4);
 
 EntityManager@ entityManager;
 
-void onInit(CRules@ this)
+void onRestart(CRules@ this)
 {
-	onRestart(this);
+	this.RemoveScript(getCurrentScriptName());
 }
 
-void onRestart(CRules@ this)
+void onInit(CRules@ this)
 {
 	@entityManager = Entity::getManager();
 

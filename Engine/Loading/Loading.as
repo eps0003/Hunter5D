@@ -34,7 +34,17 @@ shared class LoadingManager
 
 	void Update()
 	{
-		if (isMyPlayerLoaded()) return;
+		if (isClient() && isMyPlayerLoaded()) return;
+
+		if (isServer() && isServerLoaded())
+		{
+			// Add script the tick after the server is finished loading
+			if (!rules.hasScript("Server.as"))
+			{
+				rules.AddScript("Server.as");
+			}
+			return;
+		}
 
 		SkipSteps();
 
@@ -45,7 +55,9 @@ shared class LoadingManager
 			if (getLocalPlayer() !is null)
 			{
 				SetMyPlayerLoaded();
+				rules.AddScript("Client.as");
 			}
+
 			return;
 		}
 
