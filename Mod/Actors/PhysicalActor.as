@@ -199,13 +199,13 @@ shared class PhysicalActor : Actor, Collision
 	void SerializeTick(CBitStream@ bs)
 	{
 		Actor::SerializeTick(bs);
-		// bs.write_u8(collisionFlags);
+		bs.write_u8(collisionFlags);
 	}
 
 	bool deserializeTick(CBitStream@ bs)
 	{
 		if (!Actor::deserializeTick(bs)) return false;
-		// if (!bs.saferead_u8(collisionFlags)) return false;
+		if (!bs.saferead_u8(collisionFlags)) return false;
 		return true;
 	}
 

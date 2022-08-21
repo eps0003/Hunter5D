@@ -112,7 +112,8 @@ shared class EntityManager
 		}
 
 		entities.removeAt(index);
-		packets.delete("" + id);
+		packets.delete("entity" + id);
+		packets.delete("actor" + id);
 		print("Removed entity: " + id);
 	}
 
@@ -175,7 +176,7 @@ shared class EntityManager
 			{
 				CBitStream bs;
 				actor.SerializeTickClient(bs);
-				rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
+				rules.SendCommand(rules.getCommandID("sync actor"), bs, true);
 			}
 		}
 	}
@@ -189,7 +190,19 @@ shared class EntityManager
 		u16 id;
 		if (!bs.saferead_u16(id)) return;
 
-		packets.set("" + id, bs2);
+		packets.set("entity" + id, bs2);
+	}
+
+	void DeserializeActor(CBitStream@ bs)
+	{
+		CBitStream bs2;
+		bs2.writeBitStream(bs, bs.getBitIndex(), bs.getBitsUsed() - bs.getBitIndex());
+		bs2.ResetBitIndex();
+
+		u16 id;
+		if (!bs.saferead_u16(id)) return;
+
+		packets.set("actor" + id, bs2);
 	}
 
 	void UpdateEntities()
@@ -206,7 +219,7 @@ shared class EntityManager
 			if (!isServer())
 			{
 				CBitStream@ bs;
-				if (packets.get("" + entity.getId(), @bs))
+				if (packets.get("entity" + entity.getId(), @bs))
 				{
 					bs.ResetBitIndex();
 					entity.deserializeTick(bs);
@@ -217,7 +230,7 @@ shared class EntityManager
 			if (actor !is null && !actor.getPlayer().isMyPlayer())
 			{
 				CBitStream@ bs;
-				if (packets.get("" + actor.getId(), @bs))
+				if (packets.get("actor" + actor.getId(), @bs))
 				{
 					bs.ResetBitIndex();
 					actor.deserializeTickClient(bs);
