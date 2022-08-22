@@ -287,7 +287,7 @@ namespace Map
 	shared MapRenderer@ getRenderer()
 	{
 		MapRenderer@ renderer;
-		if (!getRules().get("map renderer", @renderer))
+		if (!getRules().get("map renderer", @renderer) && isClient())
 		{
 			@renderer = MapRenderer();
 			getRules().set("map renderer", @renderer);

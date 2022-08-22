@@ -159,7 +159,7 @@ namespace Camera
 	shared Camera@ getCamera()
 	{
 		Camera@ camera;
-		if (!getRules().get("camera", @camera))
+		if (!getRules().get("camera", @camera) && isClient())
 		{
 			@camera = Camera();
 			getRules().set("camera", @camera);
