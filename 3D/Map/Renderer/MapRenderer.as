@@ -12,7 +12,7 @@ shared class MapRenderer
 
 	// Chunk size cannot be larger than 15 due to the u16 index buffer limit
 	// Chunks won't render property at larger chunk sizes on a checkboard map
-	u8 chunkSize = 12;
+	u8 chunkSize = 8;
 	Vec3f chunkDimensions;
 	uint chunkCount = 0;
 
