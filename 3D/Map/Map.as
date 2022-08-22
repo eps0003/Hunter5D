@@ -9,6 +9,7 @@ shared class Map
 	uint blockCount = 0;
 
 	private CRules@ rules = getRules();
+	private MapRenderer@ mapRenderer = Map::getRenderer();
 
 	void Init(Vec3f dimensions)
 	{
@@ -101,6 +102,11 @@ shared class Map
 		if (oldBlock == block) return;
 
 		blocks[index] = block;
+
+		if (isClient())
+		{
+			mapRenderer.GenerateMesh(index);
+		}
 	}
 
 	void SetHealth(int index, u8 health, CPlayer@ player = null)

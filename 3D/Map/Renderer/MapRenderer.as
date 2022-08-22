@@ -5,7 +5,7 @@
 shared class MapRenderer
 {
 	CRules@ rules = getRules();
-	Map@ map = Map::getMap();
+	Map@ map;
 
 	private Chunk@[] chunks;
 	private u8[] faceFlags;
@@ -23,6 +23,8 @@ shared class MapRenderer
 
 	void Init()
 	{
+		@map = Map::getMap();
+
 		Texture::createFromFile("pixel", "Pixel.png");
 		material.AddTexture("pixel");
 
@@ -38,131 +40,126 @@ shared class MapRenderer
 		chunks.set_length(chunkCount);
 	}
 
+	// Generates the relevant chunk meshes for a block at the specified index
 	void GenerateMesh(int index)
 	{
-		Vec3f pos = map.indexToPos(index);
-		GenerateMesh(index, pos);
-	}
+		if (map is null) return;
 
-	void GenerateMesh(Vec3f position)
-	{
-		int index = map.posToIndex(position);
-		GenerateMesh(index, position);
-	}
-
-	void GenerateMesh(int index, Vec3f position)
-	{
-		Vec3f chunkPos = worldPosToChunkPos(position);
+		Vec3f worldPos = map.indexToPos(index);
+		Vec3f chunkPos = worldPosToChunkPos(worldPos);
 		Chunk@ chunk = getChunkSafe(chunkPos);
-		if (chunk !is null)
+		if (chunk is null) return;
+
+		int x = worldPos.x;
+		int y = worldPos.y;
+		int z = worldPos.z;
+
+		int cx = chunkPos.x;
+		int cy = chunkPos.y;
+		int cz = chunkPos.z;
+
+		int xMod = x % chunkSize;
+		int yMod = y % chunkSize;
+		int zMod = z % chunkSize;
+
+		UpdateBlockFaces(index, x, y, z);
+
+		bool visible = map.isVisible(map.getBlock(index));
+
+		// Update face flags of this block and adjacent blocks
+
+		if (x > 0)
 		{
-			chunk.Rebuild();
+			index = map.posToIndex(x - 1, y, z);
+			if (visible)
+				faceFlags[index] &= ~FaceFlag::Right;
+			else if (map.isVisible(map.getBlock(index)))
+				faceFlags[index] |= FaceFlag::Right;
+		}
 
-			int x = position.x;
-			int y = position.y;
-			int z = position.z;
+		if (x + 1 < map.dimensions.x)
+		{
+			index = map.posToIndex(x + 1, y, z);
+			if (visible)
+				faceFlags[index] &= ~FaceFlag::Left;
+			else if (map.isVisible(map.getBlock(index)))
+				faceFlags[index] |= FaceFlag::Left;
+		}
 
-			int cx = chunkPos.x;
-			int cy = chunkPos.y;
-			int cz = chunkPos.z;
+		if (z > 0)
+		{
+			index = map.posToIndex(x, y, z - 1);
+			if (visible)
+				faceFlags[index] &= ~FaceFlag::Back;
+			else if (map.isVisible(map.getBlock(index)))
+				faceFlags[index] |= FaceFlag::Back;
+		}
 
-			int xMod = x % chunkSize;
-			int yMod = y % chunkSize;
-			int zMod = z % chunkSize;
+		if (z + 1 < map.dimensions.z)
+		{
+			index = map.posToIndex(x, y, z + 1);
+			if (visible)
+				faceFlags[index] &= ~FaceFlag::Front;
+			else if (map.isVisible(map.getBlock(index)))
+				faceFlags[index] |= FaceFlag::Front;
+		}
 
-			UpdateBlockFaces(index, x, y, z);
+		if (y > 0)
+		{
+			index = map.posToIndex(x, y - 1, z);
+			if (visible)
+				faceFlags[index] &= ~FaceFlag::Up;
+			else if (map.isVisible(map.getBlock(index)))
+				faceFlags[index] |= FaceFlag::Up;
+		}
 
-			bool visible = map.isVisible(map.getBlock(index));
+		if (y + 1 < map.dimensions.y)
+		{
+			index = map.posToIndex(x, y + 1, z);
+			if (visible)
+				faceFlags[index] &= ~FaceFlag::Down;
+			else if (map.isVisible(map.getBlock(index)))
+				faceFlags[index] |= FaceFlag::Down;
+		}
 
-			if (x > 0)
-			{
-				index = map.posToIndex(x - 1, y, z);
-				if (visible)
-					faceFlags[index] &= ~FaceFlag::Right;
-				else if (map.isVisible(map.getBlock(index)))
-					faceFlags[index] |= FaceFlag::Right;
-			}
+		// Rebuild this chunk and adjacent chunks if required
 
-			if (x + 1 < map.dimensions.x)
-			{
-				index = map.posToIndex(x + 1, y, z);
-				if (visible)
-					faceFlags[index] &= ~FaceFlag::Left;
-				else if (map.isVisible(map.getBlock(index)))
-					faceFlags[index] |= FaceFlag::Left;
-			}
+		chunk.Rebuild();
 
-			if (z > 0)
-			{
-				index = map.posToIndex(x, y, z - 1);
-				if (visible)
-					faceFlags[index] &= ~FaceFlag::Back;
-				else if (map.isVisible(map.getBlock(index)))
-					faceFlags[index] |= FaceFlag::Back;
-			}
+		if (xMod == 0 && cx > 0)
+		{
+			@chunk = getChunk(cx - 1, cy, cz);
+			if (chunk !is null) chunk.Rebuild();
+		}
 
-			if (z + 1 < map.dimensions.z)
-			{
-				index = map.posToIndex(x, y, z + 1);
-				if (visible)
-					faceFlags[index] &= ~FaceFlag::Front;
-				else if (map.isVisible(map.getBlock(index)))
-					faceFlags[index] |= FaceFlag::Front;
-			}
+		if (xMod == chunkSize - 1 && cx + 1 < chunkDimensions.x)
+		{
+			@chunk = getChunk(cx + 1, cy, cz);
+			if (chunk !is null) chunk.Rebuild();
+		}
 
-			if (y > 0)
-			{
-				index = map.posToIndex(x, y - 1, z);
-				if (visible)
-					faceFlags[index] &= ~FaceFlag::Up;
-				else if (map.isVisible(map.getBlock(index)))
-					faceFlags[index] |= FaceFlag::Up;
-			}
+		if (yMod == 0 && cy > 0)
+		{
+			@chunk = getChunk(cx, cy - 1, cz);
+			if (chunk !is null) chunk.Rebuild();
+		}
 
-			if (y + 1 < map.dimensions.y)
-			{
-				index = map.posToIndex(x, y + 1, z);
-				if (visible)
-					faceFlags[index] &= ~FaceFlag::Down;
-				else if (map.isVisible(map.getBlock(index)))
-					faceFlags[index] |= FaceFlag::Down;
-			}
+		if (yMod == chunkSize - 1 && cy + 1 < chunkDimensions.y)
+		{
+			@chunk = getChunk(cx, cy + 1, cz);
+			if (chunk !is null) chunk.Rebuild();
+		}
 
-			if (xMod == 0)
-			{
-				@chunk = getChunkSafe(cx - 1, cy, cz);
-				if (chunk !is null) chunk.Rebuild();
-			}
+		if (zMod == 0 && cz > 0)
+		{
+			@chunk = getChunk(cx, cy, cz - 1);
+			if (chunk !is null) chunk.Rebuild();
+		}
 
-			if (xMod == chunkSize - 1)
-			{
-				@chunk = getChunkSafe(cx + 1, cy, cz);
-				if (chunk !is null) chunk.Rebuild();
-			}
-
-			if (yMod == 0)
-			{
-				@chunk = getChunkSafe(cx, cy - 1, cz);
-				if (chunk !is null) chunk.Rebuild();
-			}
-
-			if (yMod == chunkSize - 1)
-			{
-				@chunk = getChunkSafe(cx, cy + 1, cz);
-				if (chunk !is null) chunk.Rebuild();
-			}
-
-			if (zMod == 0)
-			{
-				@chunk = getChunkSafe(cx, cy, cz - 1);
-				if (chunk !is null) chunk.Rebuild();
-			}
-
-			if (zMod == chunkSize - 1)
-			{
-				@chunk = getChunkSafe(cx, cy, cz + 1);
-				if (chunk !is null) chunk.Rebuild();
-			}
+		if (zMod == chunkSize - 1 && cz + 1 < chunkDimensions.z)
+		{
+			@chunk = getChunk(cx, cy, cz + 1);
+			if (chunk !is null) chunk.Rebuild();
 		}
 	}
 
@@ -222,19 +219,7 @@ shared class MapRenderer
 			faceFlags[index - map.dimensions.x * map.dimensions.z] &= ~FaceFlag::Up;
 	}
 
-	void UpdateBlockFaces(int index)
-	{
-		Vec3f pos = map.indexToPos(index);
-		UpdateBlockFaces(index, pos.x, pos.y, pos.z);
-	}
-
-	void UpdateBlockFaces(int x, int y, int z)
-	{
-		int index = map.posToIndex(x, y, z);
-		UpdateBlockFaces(index, x, y, z);
-	}
-
-	void UpdateBlockFaces(int index, int x, int y, int z)
+	private void UpdateBlockFaces(int index, int x, int y, int z)
 	{
 		u8 faces = FaceFlag::None;
 

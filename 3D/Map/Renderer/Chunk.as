@@ -21,7 +21,6 @@ shared class Chunk
 		position = renderer.chunkIndexToPos(index);
 
 		mesh.SetHardwareMapping(SMesh::STATIC);
-		mesh.SetDirty(SMesh::VERTEX_INDEX);
 
 		GenerateMesh();
 	}
@@ -33,6 +32,11 @@ shared class Chunk
 
 	void Render()
 	{
+		if (rebuild)
+		{
+			GenerateMesh();
+		}
+
 		if (!vertices.empty())
 		{
 			mesh.RenderMesh();
@@ -143,6 +147,7 @@ shared class Chunk
 		{
 			mesh.SetVertex(vertices);
 			mesh.SetIndices(indices);
+			mesh.SetDirty(SMesh::VERTEX_INDEX);
 			mesh.BuildMesh();
 		}
 		else

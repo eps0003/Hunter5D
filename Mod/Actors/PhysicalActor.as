@@ -147,7 +147,23 @@ shared class PhysicalActor : Actor, Collision
 	private void BlockPlacement()
 	{
 		CBlob@ blob = player.getBlob();
-		if (blob !is null && blob.isKeyJustPressed(key_action1))
+		if (blob is null) return;
+
+		// Destroy block
+		if (blob.isKeyJustPressed(key_action2))
+		{
+			Ray ray(position, rotation.dir());
+			RaycastInfo@ raycastInfo;
+			if (ray.raycastBlock(10, @raycastInfo))
+			{
+				Vec3f blockPos = raycastInfo.hitWorldPos;
+				map.ClientSetBlock(raycastInfo.hitWorldPos, 0);
+				print("Destroyed block at " + blockPos.toString());
+			}
+		}
+
+		// Place block
+		if (blob.isKeyJustPressed(key_action1))
 		{
 			Ray ray(position, rotation.dir());
 			RaycastInfo@ raycastInfo;
@@ -156,7 +172,7 @@ shared class PhysicalActor : Actor, Collision
 				Vec3f blockPos = raycastInfo.hitWorldPos + raycastInfo.normal;
 				if (map.isValidBlock(blockPos) && !map.isVisible(map.getBlock(blockPos)))
 				{
-					SColor block = SColor(255, 255, 100, 100);
+					SColor block = SColor(255, 255, 150, 150);
 					map.ClientSetBlock(blockPos, block);
 					print("Placed block at " + blockPos.toString());
 				}
@@ -176,8 +192,7 @@ shared class PhysicalActor : Actor, Collision
 			camera.position = pos;
 			camera.rotation = rot;
 
-			GUI::DrawText("Position: " + pos.toString(), Vec2f(10, 10), color_white);
-			GUI::DrawText("Velocity: " + vel.toString(), Vec2f(10, 25), color_white);
+			GUI::DrawText(pos.toString(), Vec2f(10, 10), color_white);
 		}
 	}
 
