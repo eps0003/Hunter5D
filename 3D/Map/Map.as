@@ -1,6 +1,7 @@
 #include "Vec3f.as"
 #include "MapSyncer.as"
 #include "MapRenderer.as"
+#include "Loading.as"
 
 shared class Map
 {
@@ -10,6 +11,7 @@ shared class Map
 
 	private CRules@ rules = getRules();
 	private MapRenderer@ mapRenderer = Map::getRenderer();
+	private LoadingManager@ loadingManager = Loading::getManager();
 
 	void Init(Vec3f dimensions)
 	{
@@ -55,9 +57,16 @@ shared class Map
 
 	void ClientSetBlock(int index, SColor block)
 	{
-		if (canSetBlock(getLocalPlayer(), index, block))
+		CPlayer@ player = getLocalPlayer();
+		if (canSetBlock(index, block, player))
 		{
 			SetBlock(index, block);
+
+			CBitStream bs;
+			bs.write_u32(index);
+			bs.write_u32(block.color);
+			bs.write_netid(player.getNetworkID());
+			rules.SendCommand(rules.getCommandID("server set block"), bs, false);
 		}
 	}
 
@@ -102,6 +111,15 @@ shared class Map
 		if (oldBlock == block) return;
 
 		blocks[index] = block;
+
+		if (isServer() && loadingManager.isServerLoaded())
+		{
+			CBitStream bs;
+			bs.write_u32(index);
+			bs.write_u32(block.color);
+			bs.write_netid(player.getNetworkID());
+			rules.SendCommand(rules.getCommandID("client set block"), bs, true);
+		}
 
 		if (isClient())
 		{
@@ -250,7 +268,7 @@ shared class Map
 		return vec;
 	}
 
-	bool canSetBlock(CPlayer@ player, int index, SColor block)
+	bool canSetBlock(int index, SColor block, CPlayer@ player)
 	{
 		return true;
 	}

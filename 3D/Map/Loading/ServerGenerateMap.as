@@ -43,8 +43,8 @@ shared class ServerGenerateMap : ServerLoadStep
 						return;
 					}
 
-					SColor color = generator.generateBlock(x, y, z);
-					map.SetBlock(x, y, z, color);
+					SColor block = generator.generateBlock(x, y, z);
+					map.SetBlock(x, y, z, block);
 
 					index++;
 				}
