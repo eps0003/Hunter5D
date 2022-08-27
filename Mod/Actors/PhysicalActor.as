@@ -6,6 +6,7 @@
 #include "Ray.as"
 #include "AABB.as"
 #include "Collision.as"
+#include "ActorModel.as"
 
 shared class PhysicalActor : Actor, Collision
 {
@@ -20,6 +21,8 @@ shared class PhysicalActor : Actor, Collision
 
 	private AABB@ collider;
 	private u8 collisionFlags = 0;
+
+	private ActorModel@ model;
 
 	private float moveSpeed = 0.2f;
 	private float jumpForce = 0.3f;
@@ -49,6 +52,11 @@ shared class PhysicalActor : Actor, Collision
 		if (isServer())
 		{
 			SetCollisionFlags(CollisionFlag::All);
+		}
+
+		if (isClient())
+		{
+			@model = ActorModel("KnightSkin.png");
 		}
 	}
 
@@ -194,6 +202,8 @@ shared class PhysicalActor : Actor, Collision
 
 			GUI::DrawText(pos.toString(), Vec2f(10, 10), color_white);
 		}
+
+		model.Render();
 	}
 
 	void SerializeTickClient(CBitStream@ bs)
