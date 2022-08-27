@@ -1,10 +1,12 @@
 #include "Camera.as"
 #include "Map.as"
+#include "Entity.as"
 
 #define CLIENT_ONLY
 
 Camera@ camera;
 MapRenderer@ mapRenderer;
+EntityManager@ entityManager;
 
 void onRestart(CRules@ this)
 {
@@ -15,6 +17,7 @@ void onInit(CRules@ this)
 {
 	@camera = Camera::getCamera();
 	@mapRenderer = Map::getRenderer();
+	@entityManager = Entity::getManager();
 
 	Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
 }
@@ -28,4 +31,5 @@ void Render(int id)
 
 	camera.Render();
 	mapRenderer.Render();
+	entityManager.RenderEntities();
 }

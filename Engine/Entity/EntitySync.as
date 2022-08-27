@@ -28,14 +28,6 @@ void onTick(CRules@ this)
 	entityManager.UpdateEntities();
 }
 
-void onRender(CRules@ this)
-{
-	if (entityManager !is null)
-	{
-		entityManager.RenderEntities();
-	}
-}
-
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
 	Entity@[] entities = entityManager.getEntities();
