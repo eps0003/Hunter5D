@@ -2,20 +2,29 @@
 
 shared class ActorModel : Model
 {
+	ModelSegment@ body;
+	ModelSegment@ head;
+	ModelSegment@ upperLeftArm;
+	ModelSegment@ lowerLeftArm;
+	ModelSegment@ upperRightArm;
+	ModelSegment@ lowerRightArm;
+	ModelSegment@ upperLeftLeg;
+	ModelSegment@ lowerLeftLeg;
+	ModelSegment@ upperRightLeg;
+	ModelSegment@ lowerRightLeg;
+
 	ActorModel(string texture, float scale = 1.0f)
 	{
-		super(scale);
-
-		ModelSegment@ body = AddSegment("body", "ActorBody.obj", texture);
-		ModelSegment@ head = AddSegment("head", "ActorHead.obj", texture);
-		ModelSegment@ upperLeftArm = AddSegment("upperLeftArm", "ActorUpperLeftArm.obj", texture);
-		ModelSegment@ lowerLeftArm = AddSegment("lowerLeftArm", "ActorLowerLeftArm.obj", texture);
-		ModelSegment@ upperRightArm = AddSegment("upperRightArm", "ActorUpperRightArm.obj", texture);
-		ModelSegment@ lowerRightArm = AddSegment("lowerRightArm", "ActorLowerRightArm.obj", texture);
-		ModelSegment@ upperLeftLeg = AddSegment("upperLeftLeg", "ActorUpperLeftLeg.obj", texture);
-		ModelSegment@ lowerLeftLeg = AddSegment("lowerLeftLeg", "ActorLowerLeftLeg.obj", texture);
-		ModelSegment@ upperRightLeg = AddSegment("upperRightLeg", "ActorUpperRightLeg.obj", texture);
-		ModelSegment@ lowerRightLeg = AddSegment("lowerRightLeg", "ActorLowerRightLeg.obj", texture);
+		@body = ModelSegment("ActorBody.obj", texture);
+		@head = ModelSegment("ActorHead.obj", texture);
+		@upperLeftArm = ModelSegment("ActorUpperLeftArm.obj", texture);
+		@lowerLeftArm = ModelSegment("ActorLowerLeftArm.obj", texture);
+		@upperRightArm = ModelSegment("ActorUpperRightArm.obj", texture);
+		@lowerRightArm = ModelSegment("ActorLowerRightArm.obj", texture);
+		@upperLeftLeg = ModelSegment("ActorUpperLeftLeg.obj", texture);
+		@lowerLeftLeg = ModelSegment("ActorLowerLeftLeg.obj", texture);
+		@upperRightLeg = ModelSegment("ActorUpperRightLeg.obj", texture);
+		@lowerRightLeg = ModelSegment("ActorLowerRightLeg.obj", texture);
 
 		body.AddChild(head);
 		body.AddChild(upperLeftArm);
@@ -36,5 +45,7 @@ shared class ActorModel : Model
 		lowerRightArm.initialOffset = Vec3f(0.125f, -0.375f, -0.125f);
 		lowerLeftLeg.initialOffset = Vec3f(-0.125f, -0.375f, 0.125f);
 		lowerRightLeg.initialOffset = Vec3f(0.125f, -0.375f, 0.125f);
+
+		super(body, scale);
 	}
 }
