@@ -1,11 +1,17 @@
 #include "Config.as"
 #include "Maths.as"
 #include "Vec3f.as"
+#include "Interpolation.as"
 
 shared class Camera
 {
-	private Vec3f position;
-	private Vec3f rotation;
+	Vec3f position;
+	private Vec3f prevPosition;
+	Vec3f interPosition;
+
+	Vec3f rotation;
+	private Vec3f prevRotation;
+	Vec3f interRotation;
 
 	private SColor fogColor = SColor(255, 165, 189, 200);
 
@@ -30,38 +36,25 @@ shared class Camera
 		UpdateFog();
 	}
 
+	void Update()
+	{
+		prevPosition = position;
+		prevRotation = rotation;
+	}
+
 	void Render()
 	{
+		float t = Interpolation::getFrameTime();
+		interPosition = prevPosition.lerp(position, t);
+		interRotation = prevRotation.lerpAngle(rotation, t);
+
+		UpdateViewMatrix();
+		UpdateRotationMatrix();
+
 		Vec2f screenDim = driver.getScreenDimensions();
 		GUI::DrawRectangle(Vec2f_zero, screenDim, fogColor);
 
 		Render::SetTransform(modelMatrix, viewMatrix, projectionMatrix);
-	}
-
-	Vec3f position
-	{
-		get const
-		{
-			return position;
-		}
-		set
-		{
-			position = value;
-			UpdateViewMatrix();
-		}
-	}
-
-	Vec3f rotation
-	{
-		get const
-		{
-			return rotation;
-		}
-		set
-		{
-			rotation = value;
-			UpdateRotationMatrix();
-		}
 	}
 
 	float getFOV()
@@ -124,7 +117,7 @@ shared class Camera
 	{
 		float[] translation;
 		Matrix::MakeIdentity(translation);
-		Matrix::SetTranslation(translation, -position.x, -position.y, -position.z);
+		Matrix::SetTranslation(translation, -interPosition.x, -interPosition.y, -interPosition.z);
 
 		Matrix::Multiply(rotationMatrix, translation, viewMatrix);
 	}
@@ -133,15 +126,15 @@ shared class Camera
 	{
 		float[] tempX;
 		Matrix::MakeIdentity(tempX);
-		Matrix::SetRotationDegrees(tempX, rotation.x, 0, 0);
+		Matrix::SetRotationDegrees(tempX, interRotation.x, 0, 0);
 
 		float[] tempY;
 		Matrix::MakeIdentity(tempY);
-		Matrix::SetRotationDegrees(tempY, 0, rotation.y, 0);
+		Matrix::SetRotationDegrees(tempY, 0, interRotation.y, 0);
 
 		float[] tempZ;
 		Matrix::MakeIdentity(tempZ);
-		Matrix::SetRotationDegrees(tempZ, 0, 0, rotation.z);
+		Matrix::SetRotationDegrees(tempZ, 0, 0, interRotation.z);
 
 		Matrix::Multiply(tempX, tempZ, rotationMatrix);
 		Matrix::Multiply(rotationMatrix, tempY, rotationMatrix);

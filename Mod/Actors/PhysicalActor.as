@@ -7,24 +7,31 @@
 #include "AABB.as"
 #include "Collision.as"
 #include "ActorModel.as"
+#include "PhysicalActorRunAnim.as"
 
 shared class PhysicalActor : Actor, Collision
 {
 	Vec3f position;
 	private Vec3f prevPosition;
+	Vec3f interPosition;
 
 	Vec3f rotation;
 	private Vec3f prevRotation;
+	Vec3f interRotation;
 
 	Vec3f velocity;
 	private Vec3f prevVelocity;
+	Vec3f interVelocity;
 
 	private AABB@ collider;
 	private u8 collisionFlags = 0;
 
 	private ActorModel@ model;
 
-	private float moveSpeed = 0.2f;
+	private Vec3f cameraPosition = Vec3f(0, 1.6f, 0);
+
+	private float acceleration = 0.08f;
+	private float friction = 0.3f;
 	private float jumpForce = 0.3f;
 	private float gravity = -0.04f;
 
@@ -47,7 +54,7 @@ shared class PhysicalActor : Actor, Collision
 
 	void Init()
 	{
-		SetCollider(AABB(Vec3f(-0.3f, -1.6f, -0.3f), Vec3f(0.3f, 1.8f, 0.3f)));
+		SetCollider(AABB(Vec3f(-0.3f, 0, -0.3f), Vec3f(0.3f, 1.8f, 0.3f)));
 
 		if (isServer())
 		{
@@ -57,6 +64,7 @@ shared class PhysicalActor : Actor, Collision
 		if (isClient())
 		{
 			@model = ActorModel("KnightSkin.png");
+			model.SetAnimation(PhysicalActorRunAnim(this, model));
 		}
 	}
 
@@ -84,6 +92,15 @@ shared class PhysicalActor : Actor, Collision
 
 			this.Collision();
 			BlockPlacement();
+		}
+	}
+
+	void PostUpdate()
+	{
+		if (player.isMyPlayer())
+		{
+			camera.position = position + cameraPosition;
+			camera.rotation = rotation;
 		}
 	}
 
@@ -118,8 +135,8 @@ shared class PhysicalActor : Actor, Collision
 			velocity.y = jumpForce;
 		}
 
-		velocity.x = dir.x * moveSpeed;
-		velocity.z = dir.y * moveSpeed;
+		velocity.x += dir.x * acceleration - friction * velocity.x;
+		velocity.z += dir.y * acceleration - friction * velocity.z;
 	}
 
 	private void Collision()
@@ -160,7 +177,7 @@ shared class PhysicalActor : Actor, Collision
 		// Destroy block
 		if (blob.isKeyJustPressed(key_action2))
 		{
-			Ray ray(position, rotation.dir());
+			Ray ray(position + cameraPosition, rotation.dir());
 			RaycastInfo@ raycastInfo;
 			if (ray.raycastBlock(10, @raycastInfo))
 			{
@@ -173,7 +190,7 @@ shared class PhysicalActor : Actor, Collision
 		// Place block
 		if (blob.isKeyJustPressed(key_action1))
 		{
-			Ray ray(position, rotation.dir());
+			Ray ray(position + cameraPosition, rotation.dir());
 			RaycastInfo@ raycastInfo;
 			if (ray.raycastBlock(10, @raycastInfo))
 			{
@@ -190,20 +207,22 @@ shared class PhysicalActor : Actor, Collision
 
 	void Render()
 	{
-		if (player.isMyPlayer())
+		if (isClient())
 		{
 			float t = Interpolation::getFrameTime();
-			Vec3f pos = prevPosition.lerp(position, t);
-			Vec3f vel = prevVelocity.lerp(velocity, t);
-			Vec3f rot = prevRotation.lerpAngle(rotation, t);
-
-			camera.position = pos;
-			camera.rotation = rot;
-
-			GUI::DrawText(pos.toString(), Vec2f(10, 10), color_white);
+			interPosition = prevPosition.lerp(position, t);
+			interVelocity = prevVelocity.lerp(velocity, t);
+			interRotation = prevRotation.lerpAngle(rotation, t);
 		}
 
-		model.Render();
+		if (player.isMyPlayer())
+		{
+			GUI::DrawText(interPosition.toString(), Vec2f(10, 10), color_white);
+		}
+		else
+		{
+			model.Render();
+		}
 	}
 
 	void SerializeTickClient(CBitStream@ bs)
@@ -211,6 +230,7 @@ shared class PhysicalActor : Actor, Collision
 		Actor::SerializeTickClient(bs);
 		position.Serialize(bs);
 		rotation.Serialize(bs);
+		velocity.Serialize(bs);
 	}
 
 	bool deserializeTickClient(CBitStream@ bs)
@@ -218,6 +238,7 @@ shared class PhysicalActor : Actor, Collision
 		if (!Actor::deserializeTickClient(bs)) return false;
 		if (!position.deserialize(bs)) return false;
 		if (!rotation.deserialize(bs)) return false;
+		if (!velocity.deserialize(bs)) return false;
 		return true;
 	}
 
@@ -239,6 +260,7 @@ shared class PhysicalActor : Actor, Collision
 		Actor::SerializeInit(bs);
 		position.Serialize(bs);
 		rotation.Serialize(bs);
+		velocity.Serialize(bs);
 		bs.write_u8(collisionFlags);
 	}
 
@@ -247,6 +269,7 @@ shared class PhysicalActor : Actor, Collision
 		if (!Actor::deserializeInit(bs)) return false;
 		if (!position.deserialize(bs)) return false;
 		if (!rotation.deserialize(bs)) return false;
+		if (!velocity.deserialize(bs)) return false;
 		if (!bs.saferead_u8(collisionFlags)) return false;
 		return true;
 	}

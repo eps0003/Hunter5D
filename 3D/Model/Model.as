@@ -1,6 +1,7 @@
 #include "ModelSegment.as"
 #include "Interpolation.as"
 #include "CMatrix.as"
+#include "Animation.as"
 
 shared class Model
 {
@@ -10,6 +11,8 @@ shared class Model
 
 	private dictionary segments;
 	private ModelSegment@ rootSegment;
+
+	private ModelAnimation@ animation;
 
 	Model(float scale)
 	{
@@ -51,8 +54,19 @@ shared class Model
 		return segment;
 	}
 
+	void SetAnimation(ModelAnimation@ animation)
+	{
+		@this.animation = animation;
+	}
+
 	void Render()
 	{
+		if (animation !is null)
+		{
+			float t = (Interpolation::getGameTime() / getTicksASecond()) % 1.0f;
+			animation.Animate(t);
+		}
+
 		CMatrix scaleMatrix;
 		scaleMatrix.SetScale(scale);
 		matrix *= scaleMatrix;

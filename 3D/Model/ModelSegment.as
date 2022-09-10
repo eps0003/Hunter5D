@@ -70,7 +70,7 @@ shared class ModelSegment
 		initialOriginMatrix.SetTranslation(-initialOrigin);
 
 		CMatrix initialRotationMatrix;
-		initialRotationMatrix.SetRotation(initialRotation);
+		initialRotationMatrix.SetRotation(-initialRotation);
 
 		CMatrix initialOffsetMatrix;
 		initialOffsetMatrix.SetTranslation(initialOffset);
@@ -79,6 +79,21 @@ shared class ModelSegment
 		initialScaleMatrix.SetScale(initialScale);
 
 		matrix *= initialOffsetMatrix * initialScaleMatrix * (initialRotationMatrix * initialOriginMatrix);
+
+		CMatrix originMatrix;
+		originMatrix.SetTranslation(-origin);
+
+		CMatrix rotationMatrix;
+		rotationMatrix.SetRotation(-rotation);
+
+		CMatrix offsetMatrix;
+		offsetMatrix.SetTranslation(offset);
+
+		CMatrix scaleMatrix;
+		scaleMatrix.SetScale(scale);
+
+		matrix *= offsetMatrix * scaleMatrix * (rotationMatrix * originMatrix);
+
 		this.matrix = matrix;
 
 		Render::SetModelTransform(matrix.toArray());
