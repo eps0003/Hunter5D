@@ -2,13 +2,19 @@
 
 shared class ModelSegment
 {
-	Vec3f position;
-	Vec3f rotation;
+	Vec3f initialOffset;
+	Vec3f initialOrigin;
+	Vec3f initialRotation;
+	float initialScale = 1.0f;
+
+	Vec3f offset; // Offset from parent
+	Vec3f origin; // Origin of rotation
+	Vec3f rotation; // Rotation around origin (TODO: use quaternion)
 	float scale = 1.0f;
 
 	private SMesh mesh;
 	private ModelSegment@[] children;
-	private float[] matrix;
+	private CMatrix matrix;
 
 	ModelSegment(string modelPath, string texture)
 	{
@@ -46,7 +52,7 @@ shared class ModelSegment
 		return this;
 	}
 
-	void Render(float[] matrix, float t)
+	void Render(CMatrix matrix, float t)
 	{
 		Transform(matrix);
 
@@ -58,21 +64,23 @@ shared class ModelSegment
 		}
 	}
 
-	private void Transform(float[]@ matrix)
+	private void Transform(CMatrix@ matrix)
 	{
-		Matrix::MakeIdentity(this.matrix);
+		CMatrix initialOriginMatrix;
+		initialOriginMatrix.SetTranslation(-initialOrigin);
 
-		Matrix::SetTranslation(this.matrix, position.x, position.y, position.z);
-		Matrix::SetRotationDegrees(this.matrix, -rotation.x, -rotation.y, -rotation.z);
+		CMatrix initialRotationMatrix;
+		initialRotationMatrix.SetRotation(initialRotation);
 
-		float[] scaleMatrix;
-		Matrix::MakeIdentity(scaleMatrix);
-		Matrix::SetScale(scaleMatrix, scale, scale, scale);
+		CMatrix initialOffsetMatrix;
+		initialOffsetMatrix.SetTranslation(initialOffset);
 
-		Matrix::MultiplyImmediate(this.matrix, scaleMatrix);
-		Matrix::MultiplyImmediate(matrix, this.matrix);
-		Render::SetModelTransform(matrix);
+		CMatrix initialScaleMatrix;
+		initialScaleMatrix.SetScale(initialScale);
 
+		matrix *= initialOffsetMatrix * initialScaleMatrix * (initialRotationMatrix * initialOriginMatrix);
 		this.matrix = matrix;
+
+		Render::SetModelTransform(matrix.toArray());
 	}
 }

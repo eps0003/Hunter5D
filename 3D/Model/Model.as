@@ -1,11 +1,12 @@
 #include "ModelSegment.as"
 #include "Interpolation.as"
+#include "CMatrix.as"
 
 shared class Model
 {
 	float scale = 1.0f;
 
-	private float[] matrix;
+	private CMatrix matrix;
 
 	private dictionary segments;
 	private ModelSegment@ rootSegment;
@@ -52,12 +53,9 @@ shared class Model
 
 	void Render()
 	{
-		Matrix::MakeIdentity(matrix);
-
-		float[] scaleMatrix;
-		Matrix::MakeIdentity(scaleMatrix);
-		Matrix::SetScale(scaleMatrix, scale, scale, scale);
-		Matrix::MultiplyImmediate(matrix, scaleMatrix);
+		CMatrix scaleMatrix;
+		scaleMatrix.SetScale(scale);
+		matrix *= scaleMatrix;
 
 		rootSegment.Render(matrix, Interpolation::getFrameTime());
 	}

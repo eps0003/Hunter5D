@@ -27,5 +27,14 @@ shared class ActorModel : Model
 		upperRightArm.AddChild(lowerRightArm);
 		upperLeftLeg.AddChild(lowerLeftLeg);
 		upperRightLeg.AddChild(lowerRightLeg);
+
+		body.initialOffset = Vec3f(0, 0.75f, 0);
+		head.initialOffset = Vec3f(0, 0.75f, 0);
+		upperLeftArm.initialOffset = Vec3f(-0.25f, 0.75f, 0);
+		lowerLeftArm.initialOffset = Vec3f(-0.125f, -0.375f, -0.125f);
+		upperRightArm.initialOffset = Vec3f(0.25f, 0.75f, 0);
+		lowerRightArm.initialOffset = Vec3f(0.125f, -0.375f, -0.125f);
+		lowerLeftLeg.initialOffset = Vec3f(-0.125f, -0.375f, 0.125f);
+		lowerRightLeg.initialOffset = Vec3f(0.125f, -0.375f, 0.125f);
 	}
 }
