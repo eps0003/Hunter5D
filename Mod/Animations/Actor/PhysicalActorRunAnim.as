@@ -1,4 +1,5 @@
 #include "ModelAnimation.as"
+#include "Utilities.as"
 
 shared class PhysicalActorRunAnim : ModelAnimation
 {
@@ -15,6 +16,10 @@ shared class PhysicalActorRunAnim : ModelAnimation
 
 	void Animate(float t)
 	{
+		Vec2f a = actor.interRotation.dir().toXZ();
+		Vec2f b = actor.interVelocity.toXZ() * 3.0f;
+		float bodyAngle = b.LengthSquared() > 0 ? Maths::Clamp(Vec2f_cross(a, b) * 90, -45, 45) : 0;
+
 		float rt = t * Maths::Pi * 2.0f;
 
 		Vec2f velXZ = actor.interVelocity.toXZ();
@@ -27,13 +32,8 @@ shared class PhysicalActorRunAnim : ModelAnimation
 		float limbCos = cos * 40.0f;
 
 		model.body.offset = Vec3f(0, Maths::Abs(cos * 0.1f) * vel * 1.5f, 0) + actor.interPosition;
-		model.body.rotation = Vec3f(-4.0f * vel + Maths::Sin(rt * 2.0f) * vel * -4.0f, -velXZ.Angle() - 90, cos);
-
-		float diff = Maths::AngleDifference(actor.interRotation.y, model.body.rotation.y);
-		if (Maths::Abs(diff) > maxHeadAngle)
-		{
-			model.body.rotation.y = actor.rotation.y + maxHeadAngle * Maths::Sign(diff);
-		}
+		model.body.rotation = Vec3f(-4.0f * vel + Maths::Sin(rt * 2.0f) * vel * -4.0f, 0, cos);
+		model.body.rotation.y = actor.interRotation.y + bodyAngle;
 
 		model.head.rotation = actor.interRotation + Vec3f(Maths::Sin(rt * 2.0f) * vel * 4.0f, -model.body.rotation.y, 0);
 

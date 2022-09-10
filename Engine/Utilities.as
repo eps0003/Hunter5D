@@ -69,3 +69,8 @@ shared void RestartMap()
 {
 	LoadMap(getMap().getMapName());
 }
+
+shared float Vec2f_cross(Vec2f a, Vec2f b)
+{
+	return a.x * b.y - a.y * b.x;
+}
