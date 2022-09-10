@@ -2,8 +2,6 @@
 
 #define CLIENT_ONLY
 
-float[] fpsArr;
-
 void onInit(CRules@ this)
 {
 	onRestart(this);
