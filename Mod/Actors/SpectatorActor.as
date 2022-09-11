@@ -13,7 +13,7 @@ shared class SpectatorActor : Actor
 	Vec3f rotation;
 	private Vec3f prevRotation;
 
-	private float moveSpeed = 0.2f;
+	private float moveSpeed = 0.5f;
 
 	private CControls@ controls = getControls();
 	private Camera@ camera = Camera::getCamera();
@@ -71,20 +71,41 @@ shared class SpectatorActor : Actor
 			rotation.z = Maths::Clamp(rotation.z, -90, 90);
 			rotation.y = (rotation.y + 360.0f) % 360.0f;
 
-			// Block placement
-			if (player.getBlob().isKeyJustPressed(key_action1))
+			BlockPlacement();
+		}
+	}
+
+	private void BlockPlacement()
+	{
+		CBlob@ blob = player.getBlob();
+		if (blob is null) return;
+
+		// Destroy block
+		if (blob.isKeyJustPressed(key_action2))
+		{
+			Ray ray(position, rotation.dir());
+			RaycastInfo@ raycastInfo;
+			if (ray.raycastBlock(10, @raycastInfo))
 			{
-				Ray ray(position, rotation.dir());
-				RaycastInfo@ raycastInfo;
-				if (ray.raycastBlock(10, @raycastInfo))
+				Vec3f blockPos = raycastInfo.hitWorldPos;
+				map.ClientSetBlock(raycastInfo.hitWorldPos, 0);
+				print("Destroyed block at " + blockPos.toString());
+			}
+		}
+
+		// Place block
+		if (blob.isKeyJustPressed(key_action1))
+		{
+			Ray ray(position, rotation.dir());
+			RaycastInfo@ raycastInfo;
+			if (ray.raycastBlock(10, @raycastInfo))
+			{
+				Vec3f blockPos = raycastInfo.hitWorldPos + raycastInfo.normal;
+				if (map.isValidBlock(blockPos) && !map.isVisible(map.getBlock(blockPos)))
 				{
-					Vec3f blockPos = raycastInfo.hitWorldPos + raycastInfo.normal;
-					if (map.isValidBlock(blockPos) && !map.isVisible(map.getBlock(blockPos)))
-					{
-						SColor block = SColor(255, 255, 100, 100);
-						map.ClientSetBlock(blockPos, block);
-						print("Placed block at " + blockPos.toString());
-					}
+					SColor block = SColor(255, 255, 150, 150);
+					map.ClientSetBlock(blockPos, block);
+					print("Placed block at " + blockPos.toString());
 				}
 			}
 		}
