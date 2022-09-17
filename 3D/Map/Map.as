@@ -18,6 +18,11 @@ shared class Map
 		this.dimensions = dimensions;
 		blockCount = dimensions.x * dimensions.y * dimensions.z;
 		blocks = array<SColor>(blockCount, 0);
+
+		if (isClient())
+		{
+			mapRenderer.Init();
+		}
 	}
 
 	void ClientSetBlockSafe(Vec3f position, SColor block)
@@ -130,6 +135,11 @@ shared class Map
 	void SetBlockInit(int index, SColor block)
 	{
 		blocks[index] = block;
+
+		if (isClient())
+		{
+			mapRenderer.InitBlockFaces(index);
+		}
 	}
 
 	void SetHealth(int index, u8 health, CPlayer@ player = null)

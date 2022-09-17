@@ -204,7 +204,7 @@ shared class MapSyncer
 			uint block;
 			if (!packet.saferead_u32(block)) return;
 
-			map.SetBlock(i, block);
+			map.SetBlockInit(i, block);
 		}
 
 		// Increment packets processed

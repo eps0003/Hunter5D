@@ -33,7 +33,7 @@ shared class MapRenderer
 		material.SetFlag(SMaterial::FOG_ENABLE, true);
 		material.SetMaterialType(SMaterial::TRANSPARENT_ALPHA_CHANNEL_REF);
 
-		faceFlags.set_length(map.blockCount);
+		faceFlags = array<u8>(map.blockCount, FaceFlag::None);
 
 		chunkDimensions = (map.dimensions / chunkSize).ceil();
 		chunkCount = chunkDimensions.x * chunkDimensions.y * chunkDimensions.z;
@@ -196,27 +196,27 @@ shared class MapRenderer
 		}
 	}
 
-	void InitBlockFaces(int index, int x, int y, int z)
+	void InitBlockFaces(int index)
 	{
-		if (!map.isVisible(map.getBlock(index))) return;
+		Vec3f pos = map.indexToPos(index);
 
-		u8 faces = FaceFlag::Right | FaceFlag::Back | FaceFlag::Up;
+		faceFlags[index] = FaceFlag::All;
 
-		if (x == 0 || !map.isVisible(map.getBlock(index - 1)))
-			faces |= FaceFlag::Left;
-		if (z == 0 || !map.isVisible(map.getBlock(index - map.dimensions.x)))
-			faces |= FaceFlag::Front;
-		if (y == 0 || !map.isVisible(map.getBlock(index - map.dimensions.x * map.dimensions.z)))
-			faces |= FaceFlag::Down;
-
-		faceFlags[index] = faces;
-
-		if (x > 0)
+		if (pos.x > 0 && faceFlags[index - 1] != FaceFlag::None)
+		{
 			faceFlags[index - 1] &= ~FaceFlag::Right;
-		if (z > 0)
+			faceFlags[index] &= ~FaceFlag::Left;
+		}
+		if (pos.z > 0 && faceFlags[index - map.dimensions.x] != FaceFlag::None)
+		{
 			faceFlags[index - map.dimensions.x] &= ~FaceFlag::Back;
-		if (y > 0)
+			faceFlags[index] &= ~FaceFlag::Front;
+		}
+		if (pos.y > 0 && faceFlags[index - map.dimensions.x * map.dimensions.z] != FaceFlag::None)
+		{
 			faceFlags[index - map.dimensions.x * map.dimensions.z] &= ~FaceFlag::Up;
+			faceFlags[index] &= ~FaceFlag::Down;
+		}
 	}
 
 	private void UpdateBlockFaces(int index, int x, int y, int z)
