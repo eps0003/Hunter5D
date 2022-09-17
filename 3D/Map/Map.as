@@ -132,13 +132,13 @@ shared class Map
 		}
 	}
 
-	void SetBlockInit(int index, SColor block)
+	void SetBlockInit(int index, int x, int y, int z, SColor block)
 	{
 		blocks[index] = block;
 
 		if (isClient())
 		{
-			mapRenderer.InitBlockFaces(index);
+			mapRenderer.InitBlockFaces(index, x, y, z);
 		}
 	}
 

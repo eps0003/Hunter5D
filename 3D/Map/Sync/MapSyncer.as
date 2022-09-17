@@ -193,6 +193,8 @@ shared class MapSyncer
 		uint firstBlock = index * blocksPerPacket;
 		uint lastBlock = Maths::Min(firstBlock + blocksPerPacket, map.blockCount);
 
+		Vec3f pos = map.indexToPos(firstBlock);
+
 		// Loop through these blocks and initialize
 		for (uint i = firstBlock; i < lastBlock; i++)
 		{
@@ -204,7 +206,17 @@ shared class MapSyncer
 			uint block;
 			if (!packet.saferead_u32(block)) return;
 
-			map.SetBlockInit(i, block);
+			map.SetBlockInit(i, pos.x, pos.y, pos.z, block);
+
+			pos.x++;
+			if (pos.x == 0)
+			{
+				pos.z++;
+				if (pos.y == 0)
+				{
+					pos.y++;
+				}
+			}
 		}
 
 		// Increment packets processed
