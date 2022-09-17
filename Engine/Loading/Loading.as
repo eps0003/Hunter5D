@@ -35,16 +35,7 @@ shared class LoadingManager
 	void Update()
 	{
 		if (isClient() && isMyPlayerLoaded()) return;
-
-		if (isServer() && isServerLoaded())
-		{
-			// Add script the tick after the server is finished loading
-			if (!rules.hasScript("Server.as"))
-			{
-				rules.AddScript("Server.as");
-			}
-			return;
-		}
+		if (!isClient() && isServerLoaded()) return;
 
 		SkipSteps();
 
@@ -96,6 +87,8 @@ shared class LoadingManager
 		{
 			rules.set_u8("server load index", index);
 			rules.Sync("server load index", true);
+
+			rules.AddScript("Server.as");
 		}
 
 		@prevStep = step;
