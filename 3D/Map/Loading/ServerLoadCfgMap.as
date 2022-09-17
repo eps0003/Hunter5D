@@ -15,6 +15,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 	string data;
 
 	string base64Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
+	dictionary base64Values;
 
 	Map@ map = Map::getMap();
 
@@ -22,9 +23,16 @@ shared class ServerLoadCfgMap : ServerLoadStep
 	{
 		super("Generating map...");
 		this.mapPath = mapPath;
+
+		// Cache base64 values in dictionary
+		for (uint i = 0; i < base64Chars.size(); i++)
+		{
+			string char = base64Chars.substr(i, 1);
+			base64Values.set(char, i);
+		}
 	}
 
-	private uint parse_base64(string str)
+	private uint parseBase64(string str)
 	{
 		uint output = 0;
 		uint index = 0;
@@ -32,8 +40,12 @@ shared class ServerLoadCfgMap : ServerLoadStep
 		for (int i = str.size() - 1; i >= 0; i--)
 		{
 			string char = str.substr(i, 1);
-			uint val = base64Chars.find(char);
-			output += val << (6 * index++);
+
+			uint val;
+			base64Values.get(char, val);
+
+			output += val << index;
+			index += 6;
 		}
 
 		return output;
@@ -50,9 +62,9 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 		data = mapCfg.read_string("data");
 
-		int width = parse_base64(data.substr(0, 2));
-		int height = parse_base64(data.substr(2, 2));
-		int depth = parse_base64(data.substr(4, 2));
+		int width = parseBase64(data.substr(0, 2));
+		int height = parseBase64(data.substr(2, 2));
+		int depth = parseBase64(data.substr(4, 2));
 
 		map.Init(Vec3f(width, height, depth));
 
@@ -77,7 +89,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 			{
 				// Block
 				string chunk = data.substr(dataIndex, 4);
-				uint val = parse_base64(chunk);
+				uint val = parseBase64(chunk);
 
 				SColor color(val);
 				color.setAlpha(255);
@@ -91,7 +103,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 				// Air
 				int airIndex = data.find("-", dataIndex + 1);
 				string chunk = data.substr(dataIndex + 1, airIndex - dataIndex - 1);
-				int airCount = chunk == "" ? 1 : parse_base64(chunk) + 2;
+				int airCount = chunk == "" ? 1 : parseBase64(chunk) + 2;
 				mapIndex += airCount;
 
 				dataIndex += chunk.size() + 2;
