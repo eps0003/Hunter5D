@@ -15,23 +15,20 @@ void onRestart(CRules@ this)
 void onInit(CRules@ this)
 {
 	@entityManager = Entity::getManager();
-
-	for (uint i = 0; i < getPlayerCount(); i++)
-	{
-		CPlayer@ player = getPlayer(i);
-		if (player !is null)
-		{
-			SpawnPlayer(player, SPAWN_POSITION);
-		}
-	}
-}
-
-void onNewPlayerJoin(CRules@ this, CPlayer@ player)
-{
-	SpawnPlayer(player, SPAWN_POSITION);
 }
 
 void SpawnPlayer(CPlayer@ player, Vec3f position)
 {
 	entityManager.AddEntity(PhysicalActor(getUniqueId(), player, position));
+}
+
+void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
+{
+	if (cmd == this.getCommandID("player loaded"))
+	{
+		CPlayer@ player;
+		if (!saferead_player(params, @player)) return;
+
+		SpawnPlayer(player, SPAWN_POSITION);
+	}
 }
