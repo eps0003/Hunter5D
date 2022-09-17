@@ -3,6 +3,7 @@
 shared class MapSyncer
 {
 	private Map@ map = Map::getMap();
+	private MapRenderer@ mapRenderer = Map::getRenderer();
 	private CRules@ rules = getRules();
 
 	private uint blocksPerPacket = 20000;
@@ -199,21 +200,24 @@ shared class MapSyncer
 		for (uint i = firstBlock; i < lastBlock; i++)
 		{
 			bool visible;
-			if (!packet.saferead_bool(visible)) return;
-
-			if (!visible) continue;
-
-			uint block;
-			if (!packet.saferead_u32(block)) return;
-
-			map.SetBlockInit(i, pos.x, pos.y, pos.z, block);
+			if (packet.saferead_bool(visible) && visible)
+			{
+				uint block;
+				if (packet.saferead_u32(block))
+				{
+					map.SetBlockInit(i, block);
+					mapRenderer.InitBlockFaces(i, pos.x, pos.y, pos.z);
+				}
+			}
 
 			pos.x++;
-			if (pos.x == 0)
+			if (pos.x == map.dimensions.x)
 			{
+				pos.x = 0;
 				pos.z++;
-				if (pos.y == 0)
+				if (pos.z == map.dimensions.z)
 				{
+					pos.z = 0;
 					pos.y++;
 				}
 			}

@@ -132,14 +132,9 @@ shared class Map
 		}
 	}
 
-	void SetBlockInit(int index, int x, int y, int z, SColor block)
+	void SetBlockInit(int index, SColor block)
 	{
 		blocks[index] = block;
-
-		if (isClient())
-		{
-			mapRenderer.InitBlockFaces(index, x, y, z);
-		}
 	}
 
 	void SetHealth(int index, u8 health, CPlayer@ player = null)

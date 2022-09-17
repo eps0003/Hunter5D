@@ -96,17 +96,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 				SColor block(val);
 				block.setAlpha(255);
 
-				map.SetBlockInit(mapIndex++, pos.x, pos.y, pos.z, block);
-
-				pos.x++;
-				if (pos.x == 0)
-				{
-					pos.z++;
-					if (pos.y == 0)
-					{
-						pos.y++;
-					}
-				}
+				map.SetBlockInit(mapIndex++, block);
 
 				dataIndex += 4;
 			}
@@ -119,19 +109,6 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 				mapIndex += airCount;
 				dataIndex += chunk.size() + 2;
-
-				for (uint i = 0; i < airCount; i++)
-				{
-					pos.x++;
-					if (pos.x == 0)
-					{
-						pos.z++;
-						if (pos.y == 0)
-						{
-							pos.y++;
-						}
-					}
-				}
 			}
 		}
 
