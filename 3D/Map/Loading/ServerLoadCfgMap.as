@@ -10,6 +10,9 @@ shared class ServerLoadCfgMap : ServerLoadStep
 	uint dataIndex = 0;
 	uint dataSize = 0;
 
+	uint fillCount = 0;
+	SColor fillColor(255, 103, 64, 30);
+
 	string mapPath;
 	ConfigFile mapCfg;
 	string data;
@@ -88,23 +91,39 @@ shared class ServerLoadCfgMap : ServerLoadStep
 				return;
 			}
 
-			if (data.substr(dataIndex, 1) != "-")
+			if (fillCount == 0)
 			{
-				// Block
-				chunk = data.substr(dataIndex, 4);
-				block = parseBase64(chunk);
-				block.setAlpha(255);
+				if (data.substr(dataIndex, 1) == "-")
+				{
+					// Air
+					chunk = data.substr(dataIndex + 1, data.find("-", dataIndex + 1) - dataIndex - 1);
+					mapIndex += chunk == "" ? 1 : parseBase64(chunk) + 2;
+					dataIndex += chunk.size() + 2;
+				}
+				else if (data.substr(dataIndex, 1) == "!")
+				{
+					// Filler
+					chunk = data.substr(dataIndex + 1, data.find("!", dataIndex + 1) - dataIndex - 1);
+					fillCount = chunk == "" ? 1 : parseBase64(chunk) + 2;
+					dataIndex += chunk.size() + 2;
+				}
+				else
+				{
+					// Block
+					chunk = data.substr(dataIndex, 4);
+					block = parseBase64(chunk);
+					block.setAlpha(255);
 
-				map.SetBlockInit(mapIndex++, block);
+					map.SetBlockInit(mapIndex++, block);
 
-				dataIndex += 4;
+					dataIndex += 4;
+				}
 			}
-			else
+
+			if (fillCount > 0)
 			{
-				// Air
-				chunk = data.substr(dataIndex + 1, data.find("-", dataIndex + 1) - dataIndex - 1);
-				mapIndex += chunk == "" ? 1 : parseBase64(chunk) + 2;
-				dataIndex += chunk.size() + 2;
+				map.SetBlockInit(mapIndex++, fillColor);
+				fillCount--;
 			}
 		}
 
