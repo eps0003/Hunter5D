@@ -2,7 +2,7 @@
 
 shared class ClientGenerateChunks : ClientLoadStep
 {
-	float loadRate = 20.0f;
+	float loadRate = 80.0f;
 
 	uint index = 0;
 	float inverseChunkSize;

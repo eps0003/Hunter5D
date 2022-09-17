@@ -4,7 +4,7 @@
 
 shared class ServerLoadCfgMap : ServerLoadStep
 {
-	uint blocksPerTick = 10000;
+	uint blocksPerTick = 8000;
 
 	uint mapIndex = 0;
 	uint dataIndex = 0;
@@ -16,6 +16,10 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 	string base64Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
 	dictionary base64Values;
+
+	string chunk;
+	uint value;
+	SColor block;
 
 	Map@ map = Map::getMap();
 
@@ -36,12 +40,11 @@ shared class ServerLoadCfgMap : ServerLoadStep
 	{
 		uint output = 0;
 		uint index = 0;
+		uint val;
 
 		for (int i = str.size() - 1; i >= 0; i--)
 		{
 			string char = str.substr(i, 1);
-
-			uint val;
 			base64Values.get(char, val);
 
 			output += val << index;
@@ -78,8 +81,6 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 		progress = dataIndex / float(dataSize);
 
-		Vec3f pos = map.indexToPos(mapIndex);
-
 		while (dataIndex < dataSize)
 		{
 			if (++count > blocksPerTick)
@@ -90,10 +91,8 @@ shared class ServerLoadCfgMap : ServerLoadStep
 			if (data.substr(dataIndex, 1) != "-")
 			{
 				// Block
-				string chunk = data.substr(dataIndex, 4);
-				uint val = parseBase64(chunk);
-
-				SColor block(val);
+				chunk = data.substr(dataIndex, 4);
+				block = parseBase64(chunk);
 				block.setAlpha(255);
 
 				map.SetBlockInit(mapIndex++, block);
@@ -103,11 +102,8 @@ shared class ServerLoadCfgMap : ServerLoadStep
 			else
 			{
 				// Air
-				int airIndex = data.find("-", dataIndex + 1);
-				string chunk = data.substr(dataIndex + 1, airIndex - dataIndex - 1);
-				int airCount = chunk == "" ? 1 : parseBase64(chunk) + 2;
-
-				mapIndex += airCount;
+				chunk = data.substr(dataIndex + 1, data.find("-", dataIndex + 1) - dataIndex - 1);
+				mapIndex += chunk == "" ? 1 : parseBase64(chunk) + 2;
 				dataIndex += chunk.size() + 2;
 			}
 		}
