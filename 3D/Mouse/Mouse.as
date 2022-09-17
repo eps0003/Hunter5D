@@ -6,6 +6,7 @@ shared class Mouse
 	private Vec2f velocity;
 
 	private bool wasInControl = false;
+	private Vec2f offset = isFullscreen() ? Vec2f(0, 0) : Vec2f(5, 5);
 
 	private CControls@ controls = getControls();
 	private Driver@ driver = getDriver();
@@ -51,7 +52,7 @@ shared class Mouse
 			// Calculate velocity
 			if (wasInControl)
 			{
-				velocity = center - mousePos - Vec2f(5, 5);
+				velocity = center - mousePos - offset;
 				velocity *= getSensitivity() * 0.15f;
 			}
 
