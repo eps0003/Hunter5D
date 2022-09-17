@@ -44,7 +44,7 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 void onPlayerLeave(CRules@ this, CPlayer@ player)
 {
-	if (isServer())
+	if (isServer() && entityManager.actorExists(player))
 	{
 		entityManager.RemoveActor(player);
 	}
