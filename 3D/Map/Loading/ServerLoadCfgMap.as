@@ -2,7 +2,7 @@
 #include "Map.as"
 #include "MapGenerator.as"
 
-shared class ServerLoadMagicaVoxelMap : ServerLoadStep
+shared class ServerLoadCfgMap : ServerLoadStep
 {
 	uint blocksPerTick = 10000;
 
@@ -18,7 +18,7 @@ shared class ServerLoadMagicaVoxelMap : ServerLoadStep
 
 	Map@ map = Map::getMap();
 
-	ServerLoadMagicaVoxelMap(string mapPath)
+	ServerLoadCfgMap(string mapPath)
 	{
 		super("Generating map...");
 		this.mapPath = mapPath;
@@ -91,7 +91,7 @@ shared class ServerLoadMagicaVoxelMap : ServerLoadStep
 				// Air
 				int airIndex = data.find("-", dataIndex + 1);
 				string chunk = data.substr(dataIndex + 1, airIndex - dataIndex - 1);
-				int airCount = chunk == "" ? 1 : parse_base64(chunk) + 1;
+				int airCount = chunk == "" ? 1 : parse_base64(chunk) + 2;
 				mapIndex += airCount;
 
 				dataIndex += chunk.size() + 2;
