@@ -91,10 +91,10 @@ shared class ServerLoadCfgMap : ServerLoadStep
 				string chunk = data.substr(dataIndex, 4);
 				uint val = parseBase64(chunk);
 
-				SColor color(val);
-				color.setAlpha(255);
+				SColor block(val);
+				block.setAlpha(255);
 
-				map.SetBlock(mapIndex++, color);
+				map.SetBlockInit(mapIndex++, block);
 
 				dataIndex += 4;
 			}
@@ -104,8 +104,8 @@ shared class ServerLoadCfgMap : ServerLoadStep
 				int airIndex = data.find("-", dataIndex + 1);
 				string chunk = data.substr(dataIndex + 1, airIndex - dataIndex - 1);
 				int airCount = chunk == "" ? 1 : parseBase64(chunk) + 2;
-				mapIndex += airCount;
 
+				mapIndex += airCount;
 				dataIndex += chunk.size() + 2;
 			}
 		}

@@ -127,6 +127,11 @@ shared class Map
 		}
 	}
 
+	void SetBlockInit(int index, SColor block)
+	{
+		blocks[index] = block;
+	}
+
 	void SetHealth(int index, u8 health, CPlayer@ player = null)
 	{
 		if (health == 0)
