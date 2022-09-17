@@ -107,7 +107,7 @@ shared class Map
 
 	void SetBlock(int index, SColor block, CPlayer@ player = null)
 	{
-		SColor oldBlock = blocks[index];
+		SColor oldBlock = getBlock(index);
 		if (oldBlock == block) return;
 
 		blocks[index] = block;
@@ -172,7 +172,7 @@ shared class Map
 
 	void DamageBlock(int index, uint damage, CPlayer@ player = null)
 	{
-		u8 newHealth = Maths::Clamp(blocks[index].getAlpha() - damage, 0, 255);
+		u8 newHealth = Maths::Clamp(getBlock(index).getAlpha() - damage, 0, 255);
 		SetHealth(index, newHealth, player);
 	}
 
