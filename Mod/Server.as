@@ -17,9 +17,13 @@ void onInit(CRules@ this)
 	@entityManager = Entity::getManager();
 }
 
-void SpawnPlayer(CPlayer@ player, Vec3f position)
+void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
 {
-	entityManager.AddEntity(PhysicalActor(getUniqueId(), player, position));
+	u8 currentTeam = player.getTeamNum();
+	if (currentTeam != newTeam)
+	{
+		player.server_setTeamNum(newTeam);
+	}
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
@@ -31,4 +35,9 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 		SpawnPlayer(player, SPAWN_POSITION);
 	}
+}
+
+void SpawnPlayer(CPlayer@ player, Vec3f position)
+{
+	entityManager.AddEntity(PhysicalActor(getUniqueId(), player, position));
 }

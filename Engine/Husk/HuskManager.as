@@ -19,6 +19,7 @@ void onRestart(CRules@ this)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
+	player.server_setTeamNum(0);
 	CreateHusk(player);
 }
 
@@ -30,6 +31,15 @@ void onPlayerLeave(CRules@ this, CPlayer@ player)
 void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
 {
 	CreateHusk(victim);
+}
+
+void onPlayerChangedTeam(CRules@ this, CPlayer@ player, u8 oldTeam, u8 newTeam)
+{
+	CBlob@ blob = player.getBlob();
+	if (blob !is null)
+	{
+		blob.server_setTeamNum(newTeam);
+	}
 }
 
 void CreateHusk(CPlayer@ player)

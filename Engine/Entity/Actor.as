@@ -16,6 +16,16 @@ shared class Actor : Entity
 		return player;
 	}
 
+	u8 getTeamNum()
+	{
+		return player.getTeamNum();
+	}
+
+	void SetTeamNum(u8 team)
+	{
+		player.server_setTeamNum(team);
+	}
+
 	void SerializeTickClient(CBitStream@ bs)
 	{
 		bs.write_u16(id);
