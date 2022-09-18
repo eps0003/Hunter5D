@@ -20,8 +20,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 	string base64Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
 	dictionary base64Values;
 
-	string chunk;
-	uint value;
+	string substr;
 	SColor block;
 
 	Map@ map = Map::getMap();
@@ -93,25 +92,27 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 			if (fillCount == 0)
 			{
-				if (data.substr(dataIndex, 1) == "-")
+				substr = data.substr(dataIndex, 1);
+
+				if (substr == "-")
 				{
 					// Air
-					chunk = data.substr(dataIndex + 1, data.find("-", dataIndex + 1) - dataIndex - 1);
-					mapIndex += chunk == "" ? 1 : parseBase64(chunk) + 2;
-					dataIndex += chunk.size() + 2;
+					substr = data.substr(dataIndex + 1, data.find("-", dataIndex + 1) - dataIndex - 1);
+					mapIndex += substr == "" ? 1 : parseBase64(substr) + 2;
+					dataIndex += substr.size() + 2;
 				}
-				else if (data.substr(dataIndex, 1) == "!")
+				else if (substr == "!")
 				{
 					// Filler
-					chunk = data.substr(dataIndex + 1, data.find("!", dataIndex + 1) - dataIndex - 1);
-					fillCount = chunk == "" ? 1 : parseBase64(chunk) + 2;
-					dataIndex += chunk.size() + 2;
+					substr = data.substr(dataIndex + 1, data.find("!", dataIndex + 1) - dataIndex - 1);
+					fillCount = substr == "" ? 1 : parseBase64(substr) + 2;
+					dataIndex += substr.size() + 2;
 				}
 				else
 				{
 					// Block
-					chunk = data.substr(dataIndex, 4);
-					block = parseBase64(chunk);
+					substr = data.substr(dataIndex, 4);
+					block = parseBase64(substr);
 					block.setAlpha(255);
 
 					map.SetBlockInit(mapIndex++, block);
