@@ -6,6 +6,7 @@ shared class Mouse
 	private Vec2f velocity;
 
 	private bool wasInControl = false;
+	private uint hasMenusTick = 0;
 	private Vec2f offset = isFullscreen() ? Vec2f(0, 0) : Vec2f(5, 5);
 
 	private CControls@ controls = getControls();
@@ -32,7 +33,7 @@ shared class Mouse
 
 	bool isInControl()
 	{
-		return !isVisible() && loadingManager.isMyPlayerLoaded();
+		return !isVisible() && loadingManager.isMyPlayerLoaded() && getGameTime() - hasMenusTick > 1;
 	}
 
 	bool isVisible()
@@ -40,7 +41,7 @@ shared class Mouse
 		return Menu::getMainMenu() !is null || hud.hasMenus() || Engine::hasStandardGUIFocus() || !isWindowFocused();
 	}
 
-	void CalculateVelocity()
+	void Update()
 	{
 		Vec2f mousePos = controls.getMouseScreenPos();
 		Vec2f center = driver.getScreenCenterPos();
@@ -64,6 +65,12 @@ shared class Mouse
 		}
 
 		wasInControl = isInControl();
+
+		// Store tick menus were last open
+		if (hud.hasMenus())
+		{
+			hasMenusTick = getGameTime();
+		}
 	}
 
 	void UpdateVisibility()

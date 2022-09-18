@@ -16,7 +16,7 @@ void onRestart(CRules@ this)
 
 void onTick(CRules@ this)
 {
-	mouse.CalculateVelocity();
+	mouse.Update();
 }
 
 void onRender(CRules@ this)

@@ -77,6 +77,8 @@ shared class SpectatorActor : Actor
 
 	private void BlockPlacement()
 	{
+		if (!mouse.isInControl()) return;
+
 		CBlob@ blob = player.getBlob();
 		if (blob is null) return;
 

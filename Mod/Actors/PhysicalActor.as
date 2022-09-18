@@ -171,6 +171,8 @@ shared class PhysicalActor : Actor, Collision
 
 	private void BlockPlacement()
 	{
+		if (!mouse.isInControl()) return;
+
 		CBlob@ blob = player.getBlob();
 		if (blob is null) return;
 
