@@ -398,6 +398,17 @@ shared class Vec3f
 		);
 	}
 
+	float sum()
+	{
+		return x + y + z;
+	}
+
+	float product()
+	{
+		return x * y * z;
+	}
+
+
 	Vec2f toXZ()
 	{
 		return Vec2f(x, z);

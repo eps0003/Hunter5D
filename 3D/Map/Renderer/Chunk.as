@@ -5,7 +5,11 @@ shared class Chunk
 	private Map@ map;
 	private MapRenderer@ renderer;
 
-	private Vec3f position;
+	private Vec3f chunkPosition;
+	private Vec3f worldPosition;
+	private uint worldIndex;
+	private Vec3f dimensions;
+	private uint blockCount;
 
 	private SMesh mesh;
 	private Vertex[] vertices;
@@ -13,12 +17,16 @@ shared class Chunk
 
 	private bool rebuild = true;
 
-	Chunk(MapRenderer@ renderer, uint index)
+	Chunk(MapRenderer@ renderer, uint chunkIndex)
 	{
 		@this.renderer = renderer;
 		@map = renderer.map;
 
-		position = renderer.chunkIndexToPos(index);
+		chunkPosition = renderer.chunkIndexToPos(chunkIndex);
+		worldPosition = chunkPosition * renderer.chunkSize;
+		worldIndex = map.posToIndex(worldPosition);
+		dimensions = (worldPosition + renderer.chunkSize).min(map.dimensions) - worldPosition;
+		blockCount = dimensions.product();
 
 		mesh.SetHardwareMapping(SMesh::STATIC);
 
@@ -61,84 +69,108 @@ shared class Chunk
 		vertices.clear();
 		indices.clear();
 
-		Vec3f startWorldPos = position * renderer.chunkSize;
-		Vec3f endWorldPos = (startWorldPos + renderer.chunkSize).min(map.dimensions);
+		// Copy worldIndex so it can be incremented
+		uint worldIndex = this.worldIndex;
 
-		for (uint y = startWorldPos.y; y < endWorldPos.y; y++)
-		for (uint z = startWorldPos.z; z < endWorldPos.z; z++)
-		for (uint x = startWorldPos.x; x < endWorldPos.x; x++)
+		uint chunkX = 0;
+		uint chunkY = 0;
+		uint chunkZ = 0;
+
+		uint x;
+		uint y;
+		uint z;
+
+		SColor block;
+		SColor col;
+
+		float x1 = 0;
+		float y1 = 0;
+		float x2 = 1;
+		float y2 = 1;
+
+		for (uint i = 0; i < blockCount; i++)
 		{
-			int index = renderer.map.posToIndex(x, y, z);
-
-			if (renderer.getFaceFlags(index) != FaceFlag::None)
+			if (renderer.getFaceFlags(worldIndex) != FaceFlag::None)
 			{
-				SColor block = map.getBlock(index);
+				block = map.getBlock(worldIndex);
 
-				float x1 = 0;
-				float y1 = 0;
-				float x2 = 1;
-				float y2 = 1;
+				x = worldPosition.x + chunkX;
+				y = worldPosition.y + chunkY;
+				z = worldPosition.z + chunkZ;
 
-				float w = 1;
-
-				if (renderer.blockHasFace(index, FaceFlag::Left))
+				if (renderer.blockHasFace(worldIndex, FaceFlag::Left))
 				{
-					SColor col = renderer.getBlockFaceColor(block, Face::Left);
-					vertices.push_back(Vertex(x, y + w, z + w, x1, y1, col));
-					vertices.push_back(Vertex(x, y + w, z    , x2, y1, col));
+					col = renderer.getBlockFaceColor(block, Face::Left);
+					vertices.push_back(Vertex(x, y + 1, z + 1, x1, y1, col));
+					vertices.push_back(Vertex(x, y + 1, z    , x2, y1, col));
 					vertices.push_back(Vertex(x, y    , z    , x2, y2, col));
-					vertices.push_back(Vertex(x, y    , z + w, x1, y2, col));
+					vertices.push_back(Vertex(x, y    , z + 1, x1, y2, col));
 					AddIndices();
 				}
 
-				if (renderer.blockHasFace(index, FaceFlag::Right))
+				if (renderer.blockHasFace(worldIndex, FaceFlag::Right))
 				{
-					SColor col = renderer.getBlockFaceColor(block, Face::Right);
-					vertices.push_back(Vertex(x + w, y + w, z    , x1, y1, col));
-					vertices.push_back(Vertex(x + w, y + w, z + w, x2, y1, col));
-					vertices.push_back(Vertex(x + w, y    , z + w, x2, y2, col));
-					vertices.push_back(Vertex(x + w, y    , z    , x1, y2, col));
+					col = renderer.getBlockFaceColor(block, Face::Right);
+					vertices.push_back(Vertex(x + 1, y + 1, z    , x1, y1, col));
+					vertices.push_back(Vertex(x + 1, y + 1, z + 1, x2, y1, col));
+					vertices.push_back(Vertex(x + 1, y    , z + 1, x2, y2, col));
+					vertices.push_back(Vertex(x + 1, y    , z    , x1, y2, col));
 					AddIndices();
 				}
 
-				if (renderer.blockHasFace(index, FaceFlag::Down))
+				if (renderer.blockHasFace(worldIndex, FaceFlag::Down))
 				{
-					SColor col = renderer.getBlockFaceColor(block, Face::Down);
-					vertices.push_back(Vertex(x + w, y, z + w, x1, y1, col));
-					vertices.push_back(Vertex(x    , y, z + w, x2, y1, col));
+					col = renderer.getBlockFaceColor(block, Face::Down);
+					vertices.push_back(Vertex(x + 1, y, z + 1, x1, y1, col));
+					vertices.push_back(Vertex(x    , y, z + 1, x2, y1, col));
 					vertices.push_back(Vertex(x    , y, z    , x2, y2, col));
-					vertices.push_back(Vertex(x + w, y, z    , x1, y2, col));
+					vertices.push_back(Vertex(x + 1, y, z    , x1, y2, col));
 					AddIndices();
 				}
 
-				if (renderer.blockHasFace(index, FaceFlag::Up))
+				if (renderer.blockHasFace(worldIndex, FaceFlag::Up))
 				{
-					SColor col =  renderer.getBlockFaceColor(block, Face::Up);
-					vertices.push_back(Vertex(x    , y + w, z + w, x1, y1, col));
-					vertices.push_back(Vertex(x + w, y + w, z + w, x2, y1, col));
-					vertices.push_back(Vertex(x + w, y + w, z    , x2, y2, col));
-					vertices.push_back(Vertex(x    , y + w, z    , x1, y2, col));
+					col = renderer.getBlockFaceColor(block, Face::Up);
+					vertices.push_back(Vertex(x    , y + 1, z + 1, x1, y1, col));
+					vertices.push_back(Vertex(x + 1, y + 1, z + 1, x2, y1, col));
+					vertices.push_back(Vertex(x + 1, y + 1, z    , x2, y2, col));
+					vertices.push_back(Vertex(x    , y + 1, z    , x1, y2, col));
 					AddIndices();
 				}
 
-				if (renderer.blockHasFace(index, FaceFlag::Front))
+				if (renderer.blockHasFace(worldIndex, FaceFlag::Front))
 				{
-					SColor col = renderer.getBlockFaceColor(block, Face::Front);
-					vertices.push_back(Vertex(x    , y + w, z, x1, y1, col));
-					vertices.push_back(Vertex(x + w, y + w, z, x2, y1, col));
-					vertices.push_back(Vertex(x + w, y    , z, x2, y2, col));
+					col = renderer.getBlockFaceColor(block, Face::Front);
+					vertices.push_back(Vertex(x    , y + 1, z, x1, y1, col));
+					vertices.push_back(Vertex(x + 1, y + 1, z, x2, y1, col));
+					vertices.push_back(Vertex(x + 1, y    , z, x2, y2, col));
 					vertices.push_back(Vertex(x    , y    , z, x1, y2, col));
 					AddIndices();
 				}
 
-				if (renderer.blockHasFace(index, FaceFlag::Back))
+				if (renderer.blockHasFace(worldIndex, FaceFlag::Back))
 				{
-					SColor col = renderer.getBlockFaceColor(block, Face::Back);
-					vertices.push_back(Vertex(x + w, y + w, z + w, x1, y1, col));
-					vertices.push_back(Vertex(x    , y + w, z + w, x2, y1, col));
-					vertices.push_back(Vertex(x    , y    , z + w, x2, y2, col));
-					vertices.push_back(Vertex(x + w, y    , z + w, x1, y2, col));
+					col = renderer.getBlockFaceColor(block, Face::Back);
+					vertices.push_back(Vertex(x + 1, y + 1, z + 1, x1, y1, col));
+					vertices.push_back(Vertex(x    , y + 1, z + 1, x2, y1, col));
+					vertices.push_back(Vertex(x    , y    , z + 1, x2, y2, col));
+					vertices.push_back(Vertex(x + 1, y    , z + 1, x1, y2, col));
 					AddIndices();
+				}
+			}
+
+			chunkX++;
+			worldIndex++;
+			if (chunkX == dimensions.x)
+			{
+				chunkX = 0;
+				chunkZ++;
+				worldIndex += map.dimensions.x - dimensions.x;
+				if (chunkZ == dimensions.z)
+				{
+					chunkZ = 0;
+					chunkY++;
+					worldIndex += (map.dimensions.x * map.dimensions.z) - (map.dimensions.x * dimensions.z);
 				}
 			}
 		}
