@@ -1,6 +1,6 @@
 shared class ClientMapSyncer
 {
-	private uint blocksPerTick = 6000;
+	private uint blocksPerTick = 8000;
 
 	private CBitStream mapData;
 	private uint blockIndex;
@@ -8,6 +8,10 @@ shared class ClientMapSyncer
 
 	private Map@ map = Map::getMap();
 	private MapRenderer@ mapRenderer = Map::getRenderer();
+
+	private uint x = 0;
+	private uint y = 0;
+	private uint z = 0;
 
 	bool isSynced()
 	{
@@ -50,13 +54,18 @@ shared class ClientMapSyncer
 		// Initialize map
 		if (mapData.getBitIndex() == 0)
 		{
-			u16 x, y, z;
-			if (!mapData.saferead_u16(x)) return;
-			if (!mapData.saferead_u16(y)) return;
-			if (!mapData.saferead_u16(z)) return;
+			u16 width, height, depth;
+			if (!mapData.saferead_u16(width)) return;
+			if (!mapData.saferead_u16(height)) return;
+			if (!mapData.saferead_u16(depth)) return;
 			if (!mapData.saferead_u32(blockIndex)) return;
 
-			map.Init(Vec3f(x, y, z));
+			map.Init(Vec3f(width, height, depth));
+
+			Vec3f worldPos = map.indexToPos(blockIndex);
+			x = worldPos.x;
+			y = worldPos.y;
+			z = worldPos.z;
 		}
 
 		uint count = 0;
@@ -78,10 +87,11 @@ shared class ClientMapSyncer
 				if (!mapData.saferead_u32(block)) return;
 
 				map.SetBlockInit(blockIndex, block);
-				mapRenderer.InitBlockFaces(blockIndex);
+				mapRenderer.InitBlockFaces(blockIndex, x, y, z);
 
 				blockIndex++;
 				blocksSynced++;
+				x++;
 			}
 			else
 			{
@@ -90,11 +100,23 @@ shared class ClientMapSyncer
 
 				blockIndex += airCount;
 				blocksSynced += airCount;
+				x += airCount;
 			}
 
 			if (blockIndex >= map.blockCount)
 			{
 				blockIndex -= map.blockCount;
+			}
+
+			while (x >= map.dimensions.x)
+			{
+				x -= map.dimensions.x;
+				z++;
+				if (z == map.dimensions.z)
+				{
+					z = 0;
+					y++;
+				}
 			}
 		}
 	}
