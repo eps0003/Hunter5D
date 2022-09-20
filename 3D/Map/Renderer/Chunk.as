@@ -35,7 +35,7 @@ shared class Chunk
 
 	uint getComplexity()
 	{
-		return blockCount * vertices.size() * 0.25f;
+		return blockCount + vertices.size();
 	}
 
 	void Rebuild()
