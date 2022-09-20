@@ -2,7 +2,7 @@
 
 shared class ClientGenerateChunks : ClientLoadStep
 {
-	float loadRate = 100.0f;
+	uint loadRate = 1500000;
 
 	uint index = 0;
 	float inverseChunkSize;
@@ -22,20 +22,23 @@ shared class ClientGenerateChunks : ClientLoadStep
 
 	void Load()
 	{
-		uint chunksThisTick = Maths::Ceil(getFPS() * inverseChunkSize * loadRate);
 		uint count = 0;
 
 		progress = index / float(mapRenderer.chunkCount);
 
+		Chunk@ chunk;
+
 		while (index < mapRenderer.chunkCount)
 		{
-			if (++count > chunksThisTick)
+			if (count > 0 && count > loadRate)
 			{
 				return;
 			}
 
-			mapRenderer.SetChunk(index, Chunk(mapRenderer, index));
+			@chunk = Chunk(mapRenderer, index);
+			mapRenderer.SetChunk(index, chunk);
 
+			count += chunk.getComplexity();
 			index++;
 		}
 

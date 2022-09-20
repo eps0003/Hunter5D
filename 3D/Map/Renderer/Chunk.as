@@ -33,6 +33,11 @@ shared class Chunk
 		GenerateMesh();
 	}
 
+	uint getComplexity()
+	{
+		return blockCount * vertices.size() * 0.25f;
+	}
+
 	void Rebuild()
 	{
 		rebuild = true;

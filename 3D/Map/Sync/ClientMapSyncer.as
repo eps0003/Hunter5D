@@ -56,8 +56,6 @@ shared class ClientMapSyncer
 			if (!mapData.saferead_u16(z)) return;
 			if (!mapData.saferead_u32(blockIndex)) return;
 
-			Vec3f(x, y, z).Print();
-
 			map.Init(Vec3f(x, y, z));
 		}
 
