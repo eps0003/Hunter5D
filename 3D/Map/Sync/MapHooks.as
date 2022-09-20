@@ -2,11 +2,10 @@
 #include "Utilities.as"
 
 Map@ map;
-MapSyncer@ mapSyncer;
+ClientMapSyncer@ clientMapSyncer;
 
 void onInit(CRules@ this)
 {
-	this.addCommandID("init map");
 	this.addCommandID("sync map");
 	this.addCommandID("client set block");
 	this.addCommandID("server set block");
@@ -17,29 +16,14 @@ void onInit(CRules@ this)
 void onRestart(CRules@ this)
 {
 	@map = Map::getMap();
-	@mapSyncer = Map::getSyncer();
-}
-
-void onPlayerLeave(CRules@ this, CPlayer@ player)
-{
-	if (mapSyncer.isSyncing(player))
-	{
-		mapSyncer.RemovePlayer(player);
-	}
+	@clientMapSyncer = Map::getClientSyncer();
 }
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (!isServer() && cmd == this.getCommandID("init map"))
+	if (!isServer() && cmd == this.getCommandID("sync map"))
 	{
-		Vec3f dimensions;
-		if (!dimensions.deserialize(params)) return;
-
-		map.Init(dimensions);
-	}
-	else if (!isServer() && cmd == this.getCommandID("sync map"))
-	{
-		mapSyncer.ClientReceivePacket(params);
+		clientMapSyncer.ReceivePacket(params);
 	}
 	else if (isServer() && cmd == this.getCommandID("server set block"))
 	{

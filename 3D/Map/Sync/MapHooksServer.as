@@ -4,8 +4,7 @@
 
 #define SERVER_ONLY
 
-Map@ map;
-MapSyncer@ mapSyncer;
+ServerMapSyncer@ mapSyncer;
 
 void onRestart(CRules@ this)
 {
@@ -14,18 +13,15 @@ void onRestart(CRules@ this)
 
 void onInit(CRules@ this)
 {
-	@map = Map::getMap();
-	@mapSyncer = Map::getSyncer();
-
-	mapSyncer.AddAllPlayers();
+	@mapSyncer = Map::getServerSyncer();
 }
 
 void onTick(CRules@ this)
 {
-	mapSyncer.ServerSync();
+	mapSyncer.Sync();
 }
 
-void onNewPlayerJoin(CRules@ this, CPlayer@ player)
+void onPlayerLeave(CRules@ this, CPlayer@ player)
 {
-	mapSyncer.AddPlayer(player);
+	mapSyncer.RemovePlayer(player);
 }

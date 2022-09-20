@@ -196,23 +196,25 @@ shared class MapRenderer
 		}
 	}
 
-	void InitBlockFaces(int index, int x, int y, int z)
+	void InitBlockFaces(int index)
 	{
+		Vec3f pos = map.indexToPos(index);
+
 		faceFlags[index] = FaceFlag::All;
 
-		if (x > 0 && faceFlags[index - 1] != FaceFlag::None)
+		if (pos.x > 0 && faceFlags[index - 1] != FaceFlag::None)
 		{
 			faceFlags[index - 1] &= ~FaceFlag::Right;
 			faceFlags[index] &= ~FaceFlag::Left;
 		}
 
-		if (z > 0 && faceFlags[index - map.dimensions.x] != FaceFlag::None)
+		if (pos.z > 0 && faceFlags[index - map.dimensions.x] != FaceFlag::None)
 		{
 			faceFlags[index - map.dimensions.x] &= ~FaceFlag::Back;
 			faceFlags[index] &= ~FaceFlag::Front;
 		}
 
-		if (y > 0 && faceFlags[index - map.dimensions.x * map.dimensions.z] != FaceFlag::None)
+		if (pos.y > 0 && faceFlags[index - map.dimensions.x * map.dimensions.z] != FaceFlag::None)
 		{
 			faceFlags[index - map.dimensions.x * map.dimensions.z] &= ~FaceFlag::Up;
 			faceFlags[index] &= ~FaceFlag::Down;

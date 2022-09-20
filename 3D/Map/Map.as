@@ -1,5 +1,6 @@
 #include "Vec3f.as"
-#include "MapSyncer.as"
+#include "ServerMapSyncer.as"
+#include "ClientMapSyncer.as"
 #include "MapRenderer.as"
 #include "Loading.as"
 
@@ -307,13 +308,24 @@ namespace Map
 		return map;
 	}
 
-	shared MapSyncer@ getSyncer()
+	shared ServerMapSyncer@ getServerSyncer()
 	{
-		MapSyncer@ syncer;
-		if (!getRules().get("map syncer", @syncer))
+		ServerMapSyncer@ syncer;
+		if (!getRules().get("map syncer server", @syncer) && isServer())
 		{
-			@syncer = MapSyncer();
-			getRules().set("map syncer", @syncer);
+			@syncer = ServerMapSyncer();
+			getRules().set("map syncer server", @syncer);
+		}
+		return syncer;
+	}
+
+	shared ClientMapSyncer@ getClientSyncer()
+	{
+		ClientMapSyncer@ syncer;
+		if (!getRules().get("map syncer client", @syncer) && isClient())
+		{
+			@syncer = ClientMapSyncer();
+			getRules().set("map syncer client", @syncer);
 		}
 		return syncer;
 	}

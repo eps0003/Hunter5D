@@ -2,7 +2,7 @@
 
 shared class ClientReceiveMap : ClientLoadStep
 {
-	MapSyncer@ mapSyncer = Map::getSyncer();
+	ClientMapSyncer@ mapSyncer = Map::getClientSyncer();
 
 	ClientReceiveMap()
 	{
@@ -14,10 +14,10 @@ shared class ClientReceiveMap : ClientLoadStep
 		CPlayer@ player = getLocalPlayer();
 		if (player is null) return;
 
-		mapSyncer.ClientProcessPackets();
+		mapSyncer.Sync();
 
-		progress = mapSyncer.getProgress(player);
-		complete = mapSyncer.isSynced(player);
+		progress = mapSyncer.getProgress();
+		complete = mapSyncer.isSynced();
 
 		if (complete)
 		{
