@@ -13,6 +13,8 @@ shared class ClientMapSyncer
 	private uint y = 0;
 	private uint z = 0;
 
+	private uint val;
+
 	bool isSynced()
 	{
 		return map.blockCount > 0 && blocksSynced >= map.blockCount;
@@ -77,30 +79,25 @@ shared class ClientMapSyncer
 				return;
 			}
 
-			bool visible;
-			if (!mapData.saferead_bool(visible)) return;
+			if (!mapData.saferead_u32(val)) return;
 
-			if (visible)
+			// Check if alpha is zero
+			if (val & 4278190080 == 0)
+			{
+				// Air
+				blockIndex += val;
+				blocksSynced += val;
+				x += val;
+			}
+			else
 			{
 				// Block
-				uint block;
-				if (!mapData.saferead_u32(block)) return;
-
-				map.SetBlockInit(blockIndex, block);
+				map.SetBlockInit(blockIndex, val);
 				mapRenderer.InitBlockFaces(blockIndex, x, y, z);
 
 				blockIndex++;
 				blocksSynced++;
 				x++;
-			}
-			else
-			{
-				uint airCount;
-				if (!mapData.saferead_u32(airCount)) return;
-
-				blockIndex += airCount;
-				blocksSynced += airCount;
-				x += airCount;
 			}
 
 			if (blockIndex >= map.blockCount)

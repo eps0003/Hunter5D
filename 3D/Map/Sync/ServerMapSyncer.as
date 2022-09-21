@@ -1,6 +1,6 @@
 shared class ServerMapSyncer
 {
-	private uint blocksPerPacket = 20000;
+	private uint blocksPerPacket = 26000;
 
 	private u16 packetIndex = 0;
 	private dictionary packetsSynced;
@@ -78,20 +78,18 @@ shared class ServerMapSyncer
 			// Write air
 			if (airCount > 0)
 			{
-				bs.write_bool(false);
+				// Assumes last octet is all zeros
 				bs.write_u32(airCount);
 				airCount = 0;
 			}
 
 			// Write block
-			bs.write_bool(true);
 			bs.write_u32(block.color);
 		}
 
 		// Write remaining air
 		if (airCount > 0)
 		{
-			bs.write_bool(false);
 			bs.write_u32(airCount);
 		}
 
