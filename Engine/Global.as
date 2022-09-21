@@ -1,3 +1,5 @@
+Driver@ driver;
+
 void onInit(CRules@ this)
 {
 	onRestart(this);
@@ -13,6 +15,11 @@ void onInit(CRules@ this)
 
 void onRestart(CRules@ this)
 {
+	if (isClient())
+	{
+		@driver = getDriver();
+	}
+
 	this.set("mouse", null);
 
 	this.set("entity manager", null);
@@ -23,4 +30,9 @@ void onRestart(CRules@ this)
 	this.set("map syncer server", null);
 	this.set("map syncer client", null);
 	this.set("map renderer", null);
+}
+
+void onRender(CRules@ this)
+{
+	GUI::DrawRectangle(Vec2f_zero, driver.getScreenDimensions(), color_black);
 }
