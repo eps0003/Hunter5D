@@ -8,5 +8,8 @@ bool LoadMap(CMap@ map, const string&in fileName)
 	{
 		map.CreateTileMap(298, 105, 1.0f, "Pixel.png");
 	}
+
+	map.CreateSky(color_black);
+
 	return true;
 }

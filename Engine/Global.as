@@ -31,8 +31,3 @@ void onRestart(CRules@ this)
 	this.set("map syncer client", null);
 	this.set("map renderer", null);
 }
-
-void onRender(CRules@ this)
-{
-	GUI::DrawRectangle(Vec2f_zero, driver.getScreenDimensions(), color_black);
-}
