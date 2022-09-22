@@ -1,6 +1,7 @@
 #include "Config.as"
 #include "Maths.as"
 #include "Vec3f.as"
+#include "Frustum.as"
 #include "Interpolation.as"
 
 shared class Camera
@@ -20,6 +21,8 @@ shared class Camera
 	private float[] projectionMatrix;
 	private float[] rotationMatrix;
 
+	private Frustum frustum;
+
 	private Driver@ driver = getDriver();
 	private ConfigFile@ cfg = Config::getConfig();
 
@@ -34,6 +37,7 @@ shared class Camera
 		UpdateRotationMatrix();
 		UpdateProjectionMatrix();
 		UpdateFog();
+		UpdateFrustum();
 	}
 
 	void Update()
@@ -50,6 +54,7 @@ shared class Camera
 
 		UpdateViewMatrix();
 		UpdateRotationMatrix();
+		UpdateFrustum();
 
 		Vec2f screenDim = driver.getScreenDimensions();
 		GUI::DrawRectangle(Vec2f_zero, screenDim, fogColor);
@@ -82,6 +87,11 @@ shared class Camera
 
 		UpdateProjectionMatrix();
 		UpdateFog();
+	}
+
+	Frustum@ getFrustum()
+	{
+		return frustum;
 	}
 
 	float[] getModelMatrix()
@@ -144,6 +154,13 @@ shared class Camera
 	{
 		float renderDistance = getRenderDistance();
 		Render::SetFog(fogColor, SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
+	}
+
+	private void UpdateFrustum()
+	{
+		float[] rotProjMatrix;
+		Matrix::Multiply(projectionMatrix, rotationMatrix, rotProjMatrix);
+		frustum.Update(rotProjMatrix);
 	}
 }
 

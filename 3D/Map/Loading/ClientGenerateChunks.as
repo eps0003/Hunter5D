@@ -35,12 +35,13 @@ shared class ClientGenerateChunks : ClientLoadStep
 				return;
 			}
 
-			@chunk = Chunk(mapRenderer, index);
-			mapRenderer.SetChunk(index, chunk);
+			@chunk = mapRenderer.InitChunk(index);
 
 			count += chunk.getComplexity();
 			index++;
 		}
+
+		mapRenderer.InitTree();
 
 		complete = true;
 		print("Generated chunks!");

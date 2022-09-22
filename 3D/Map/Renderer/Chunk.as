@@ -15,6 +15,8 @@ shared class Chunk
 	private Vertex[] vertices;
 	private u16[] indices;
 
+	private AABB@ bounds;
+
 	private bool rebuild = true;
 
 	Chunk(MapRenderer@ renderer, uint chunkIndex)
@@ -28,9 +30,16 @@ shared class Chunk
 		dimensions = (worldPosition + renderer.chunkSize).min(map.dimensions) - worldPosition;
 		blockCount = dimensions.product();
 
+		@bounds = AABB(worldPosition, worldPosition + Vec3f(renderer.chunkSize));
+
 		mesh.SetHardwareMapping(SMesh::STATIC);
 
 		GenerateMesh();
+	}
+
+	AABB@ getBounds()
+	{
+		return bounds;
 	}
 
 	uint getComplexity()

@@ -1,6 +1,7 @@
 #include "Map.as"
 #include "Chunk.as"
 #include "FaceEnums.as"
+#include "Tree.as"
 
 shared class MapRenderer
 {
@@ -11,12 +12,14 @@ shared class MapRenderer
 	private u8[] faceFlags;
 
 	// Chunk size cannot be larger than 15 due to the u16 index buffer limit
-	// Chunks won't render property at larger chunk sizes on a checkboard map
-	u8 chunkSize = 8;
+	// Chunks won't render property at larger chunk sizes if there are too many faces
+	u8 chunkSize = 15;
 	Vec3f chunkDimensions;
 	uint chunkCount = 0;
 
 	SMaterial@ material = SMaterial();
+
+	private Tree@ tree;
 
 	private float shadeIntensity = 0.07f;
 	private u8[] shadeScale = { 2, 3, 5, 0, 1, 4 };
@@ -189,11 +192,7 @@ shared class MapRenderer
 	void Render()
 	{
 		material.SetVideoMaterial();
-
-		for (uint i = 0; i < chunks.size(); i++)
-		{
-			chunks[i].Render();
-		}
+		tree.RenderVisibleChunks();
 	}
 
 	void InitBlockFaces(int index, int x, int y, int z)
@@ -259,9 +258,15 @@ shared class MapRenderer
 		faceFlags[index] = faces;
 	}
 
-	void SetChunk(int index, Chunk@ chunk)
+	Chunk@ InitChunk(int index)
 	{
-		@chunks[index] = chunk;
+		@chunks[index] = Chunk(this, index);
+		return chunks[index];
+	}
+
+	void InitTree()
+	{
+		@tree = Tree(this);
 	}
 
 	Chunk@ getChunkSafe(Vec3f position)
