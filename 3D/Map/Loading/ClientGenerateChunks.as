@@ -4,6 +4,8 @@ shared class ClientGenerateChunks : ClientLoadStep
 {
 	uint loadRate = 40000;
 
+	uint startTick;
+
 	uint index = 0;
 	float inverseChunkSize;
 
@@ -17,6 +19,7 @@ shared class ClientGenerateChunks : ClientLoadStep
 
 	void Init()
 	{
+		startTick = getGameTime();
 		inverseChunkSize = 1.0f / Maths::Pow(mapRenderer.chunkSize, 3);
 	}
 
@@ -44,6 +47,6 @@ shared class ClientGenerateChunks : ClientLoadStep
 		mapRenderer.InitTree();
 
 		complete = true;
-		print("Generated chunks!");
+		print("Generated chunks! " + formatDuration(getGameTime() - startTick, true));
 	}
 }

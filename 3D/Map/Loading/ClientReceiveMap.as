@@ -4,9 +4,16 @@ shared class ClientReceiveMap : ClientLoadStep
 {
 	ClientMapSyncer@ mapSyncer = Map::getClientSyncer();
 
+	uint startTick;
+
 	ClientReceiveMap()
 	{
 		super("Receiving map...");
+	}
+
+	void Init()
+	{
+		startTick = getGameTime();
 	}
 
 	void Load()
@@ -21,7 +28,7 @@ shared class ClientReceiveMap : ClientLoadStep
 
 		if (complete)
 		{
-			print("Received map!");
+			print("Received map! " + formatDuration(getGameTime() - startTick, true));
 		}
 	}
 }

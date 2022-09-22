@@ -6,6 +6,8 @@ shared class ServerLoadCfgMap : ServerLoadStep
 {
 	uint blocksPerTick = 8000;
 
+	uint startTick;
+
 	uint mapIndex = 0;
 	uint dataIndex = 0;
 	uint dataSize = 0;
@@ -58,6 +60,8 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 	void Init()
 	{
+		startTick = getGameTime();
+
 		if (!mapCfg.loadFile(mapPath))
 		{
 			error("Unable to find map to load: " + mapPath);
@@ -129,7 +133,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 		}
 
 		complete = true;
-		print("Generated map!");
+		print("Generated map! " + formatDuration(getGameTime() - startTick, true));
 		getRules().AddScript("MapHooksServer.as");
 	}
 }

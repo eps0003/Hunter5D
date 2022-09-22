@@ -6,6 +6,8 @@ shared class ServerGenerateMap : ServerLoadStep
 {
 	uint blocksPerTick = 10000;
 
+	uint startTick;
+
 	MapGenerator@ generator;
 
 	uint x = 0;
@@ -23,6 +25,8 @@ shared class ServerGenerateMap : ServerLoadStep
 
 	void Init()
 	{
+		startTick = getGameTime();
+
 		map.Init(generator.getDimensions());
 	}
 
@@ -54,7 +58,7 @@ shared class ServerGenerateMap : ServerLoadStep
 		}
 
 		complete = true;
-		print("Generated map!");
+		print("Generated map! " + formatDuration(getGameTime() - startTick, true));
 		getRules().AddScript("MapHooksServer.as");
 	}
 }
