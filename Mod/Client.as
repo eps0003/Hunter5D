@@ -7,9 +7,11 @@
 Camera@ camera;
 MapRenderer@ mapRenderer;
 EntityManager@ entityManager;
+uint renderId;
 
 void onRestart(CRules@ this)
 {
+	Render::RemoveScript(renderId);
 	this.RemoveScript(getCurrentScriptName());
 }
 
@@ -19,7 +21,7 @@ void onInit(CRules@ this)
 	@mapRenderer = Map::getRenderer();
 	@entityManager = Entity::getManager();
 
-	Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
+	renderId = Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
 }
 
 void Render(int id)
