@@ -4,7 +4,7 @@
 
 shared class ServerLoadCfgMap : ServerLoadStep
 {
-	uint blocksPerTick = 8000;
+	uint blocksPerTick = 40000;
 
 	uint startTick;
 
@@ -25,6 +25,12 @@ shared class ServerLoadCfgMap : ServerLoadStep
 	string substr;
 	SColor block;
 
+	// parseBase64()
+	uint output;
+	uint index;
+	uint val;
+	int i;
+
 	Map@ map = Map::getMap();
 
 	ServerLoadCfgMap(string mapPath)
@@ -40,16 +46,14 @@ shared class ServerLoadCfgMap : ServerLoadStep
 		}
 	}
 
-	private uint parseBase64(string str)
+	private uint parseBase64(uint dataIndex, uint count)
 	{
-		uint output = 0;
-		uint index = 0;
-		uint val;
+		output = 0;
+		index = 0;
 
-		for (int i = str.size() - 1; i >= 0; i--)
+		for (i = dataIndex + count - 1; i >= dataIndex; i--)
 		{
-			string char = str.substr(i, 1);
-			base64Values.get(char, val);
+			base64Values.get(data.substr(i, 1), val);
 
 			output += val << index;
 			index += 6;
@@ -71,9 +75,9 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 		data = mapCfg.read_string("data");
 
-		int width = parseBase64(data.substr(0, 2));
-		int height = parseBase64(data.substr(2, 2));
-		int depth = parseBase64(data.substr(4, 2));
+		u16 width = parseBase64(0, 2);
+		u16 height = parseBase64(2, 2);
+		u16 depth = parseBase64(4, 2);
 
 		map.Init(Vec3f(width, height, depth));
 
@@ -89,7 +93,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 		while (dataIndex < dataSize)
 		{
-			if (++count > blocksPerTick)
+			if (count > blocksPerTick)
 			{
 				return;
 			}
@@ -101,27 +105,27 @@ shared class ServerLoadCfgMap : ServerLoadStep
 				if (substr == "-")
 				{
 					// Air
-					substr = data.substr(dataIndex + 1, 4);
-					mapIndex += parseBase64(substr) + 1;
+					mapIndex += parseBase64(dataIndex + 1, 4) + 1;
 					dataIndex += 5;
+					count++;
 				}
 				else if (substr == "!")
 				{
 					// Filler
-					substr = data.substr(dataIndex + 1, 4);
-					fillCount = parseBase64(substr) + 1;
+					fillCount = parseBase64(dataIndex + 1, 4) + 1;
 					dataIndex += 5;
+					count++;
 				}
 				else
 				{
 					// Block
-					substr = data.substr(dataIndex, 4);
-					block = parseBase64(substr);
+					block = parseBase64(dataIndex, 4);
 					block.setAlpha(255);
 
 					map.SetBlockInit(mapIndex++, block);
 
 					dataIndex += 4;
+					count += 2;
 				}
 			}
 
@@ -129,6 +133,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 			{
 				map.SetBlockInit(mapIndex++, fillColor);
 				fillCount--;
+				count++;
 			}
 		}
 
