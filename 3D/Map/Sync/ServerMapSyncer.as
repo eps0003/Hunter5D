@@ -1,9 +1,16 @@
 shared class ServerMapSyncer
 {
-	private uint blocksPerPacket = 26000;
+	private uint blocksPerPacket = 30000;
 
 	private u16 packetIndex = 0;
 	private dictionary packetsSynced;
+
+	private u16 totalPackets;
+	private SColor block;
+	private CBitStream bs;
+	private uint firstBlock;
+	private uint lastBlock;
+	private uint airCount = 0;
 
 	private Map@ map = Map::getMap();
 	private CRules@ rules = getRules();
@@ -15,21 +22,16 @@ shared class ServerMapSyncer
 		print("Removed sync player: " + username);
 	}
 
-	uint getTotalPackets()
-	{
-		return Maths::Ceil(map.blockCount / float(blocksPerPacket));
-	}
-
 	bool isSyncing(CPlayer@ player)
 	{
 		u16 packetCount;
-		return packetsSynced.get(player.getUsername(), packetCount) && packetCount < getTotalPackets();
+		return packetsSynced.get(player.getUsername(), packetCount) && packetCount < totalPackets;
 	}
 
 	bool isSynced(CPlayer@ player)
 	{
 		u16 packetCount;
-		return packetsSynced.get(player.getUsername(), packetCount) && packetCount >= getTotalPackets();
+		return packetsSynced.get(player.getUsername(), packetCount) && packetCount >= totalPackets;
 	}
 
 	private CPlayer@[] getPlayersNotSynced()
@@ -48,25 +50,26 @@ shared class ServerMapSyncer
 		return players;
 	}
 
+	void Init()
+	{
+		totalPackets = Maths::Ceil(map.blockCount / float(blocksPerPacket));
+	}
+
 	void Sync()
 	{
 		CPlayer@[] players = getPlayersNotSynced();
 		if (players.empty()) return;
 
-		uint totalPackets = getTotalPackets();
-
-		CBitStream bs;
+		bs.Clear();
 
 		// Get range of blocks to sync
-		uint firstBlock = packetIndex * blocksPerPacket;
-		uint lastBlock = Maths::Min(firstBlock + blocksPerPacket, map.blockCount);
-
-		uint airCount = 0;
+		firstBlock = packetIndex * blocksPerPacket;
+		lastBlock = Maths::Min(firstBlock + blocksPerPacket, map.blockCount);
 
 		// Loop through these blocks and serialize
 		for (uint i = firstBlock; i < lastBlock; i++)
 		{
-			SColor block = map.getBlock(i);
+			block = map.getBlock(i);
 
 			// Count air blocks
 			if (!map.isVisible(block))
@@ -91,6 +94,7 @@ shared class ServerMapSyncer
 		if (airCount > 0)
 		{
 			bs.write_u32(airCount);
+			airCount = 0;
 		}
 
 		// Make stream with initial data for players being sent their first packet
