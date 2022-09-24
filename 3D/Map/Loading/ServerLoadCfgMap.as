@@ -101,16 +101,16 @@ shared class ServerLoadCfgMap : ServerLoadStep
 				if (substr == "-")
 				{
 					// Air
-					substr = data.substr(dataIndex + 1, data.find("-", dataIndex + 1) - dataIndex - 1);
-					mapIndex += substr == "" ? 1 : parseBase64(substr) + 2;
-					dataIndex += substr.size() + 2;
+					substr = data.substr(dataIndex + 1, 4);
+					mapIndex += parseBase64(substr) + 1;
+					dataIndex += 5;
 				}
 				else if (substr == "!")
 				{
 					// Filler
-					substr = data.substr(dataIndex + 1, data.find("!", dataIndex + 1) - dataIndex - 1);
-					fillCount = substr == "" ? 1 : parseBase64(substr) + 2;
-					dataIndex += substr.size() + 2;
+					substr = data.substr(dataIndex + 1, 4);
+					fillCount = parseBase64(substr) + 1;
+					dataIndex += 5;
 				}
 				else
 				{
