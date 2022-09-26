@@ -27,9 +27,8 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 	// parseBase64()
 	uint output;
-	uint index;
-	uint val;
-	int i;
+	u8 val;
+	uint i;
 
 	Map@ map = Map::getMap();
 
@@ -41,22 +40,18 @@ shared class ServerLoadCfgMap : ServerLoadStep
 		// Cache base64 values in dictionary
 		for (uint i = 0; i < base64Chars.size(); i++)
 		{
-			string char = base64Chars.substr(i, 1);
-			base64Values.set(char, i);
+			base64Values.set(base64Chars.substr(i, 1), i);
 		}
 	}
 
-	private uint parseBase64(uint dataIndex, uint count)
+	private uint parseBase64(const uint &in index, const uint &in count)
 	{
 		output = 0;
-		index = 0;
 
-		for (i = dataIndex + count - 1; i >= dataIndex; i--)
+		for (i = index; i < index + count; i++)
 		{
 			base64Values.get(data.substr(i, 1), val);
-
-			output += val << index;
-			index += 6;
+			output = (output << 6) + val;
 		}
 
 		return output;
