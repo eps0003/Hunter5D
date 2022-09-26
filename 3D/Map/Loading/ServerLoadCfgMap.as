@@ -20,15 +20,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 	string data;
 
 	string base64Chars = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ+/";
-	dictionary base64Values;
-
-	string substr;
-	SColor block;
-
-	// parseBase64()
-	uint output;
-	u8 val;
-	uint i;
+	u8[] base64Values = array<u8>(256, 0);
 
 	Map@ map = Map::getMap();
 
@@ -37,21 +29,20 @@ shared class ServerLoadCfgMap : ServerLoadStep
 		super("Generating map...");
 		this.mapPath = mapPath;
 
-		// Cache base64 values in dictionary
+		// Cache base64 values in an array
 		for (uint i = 0; i < base64Chars.size(); i++)
 		{
-			base64Values.set(base64Chars.substr(i, 1), i);
+			base64Values[base64Chars[i]] = i;
 		}
 	}
 
-	private uint parseBase64(const uint &in index, const uint &in count)
+	private uint parseBase64(uint index, uint count)
 	{
-		output = 0;
+		uint output = 0;
 
-		for (i = index; i < index + count; i++)
+		for (uint i = index; i < index + count; i++)
 		{
-			base64Values.get(data.substr(i, 1), val);
-			output = (output << 6) + val;
+			output = (output << 6) + base64Values[data[i]];
 		}
 
 		return output;
@@ -95,16 +86,16 @@ shared class ServerLoadCfgMap : ServerLoadStep
 
 			if (fillCount == 0)
 			{
-				substr = data.substr(dataIndex, 1);
+				u8 ascii = data[dataIndex];
 
-				if (substr == "-")
+				if (ascii == 45) // "-"
 				{
 					// Air
 					mapIndex += parseBase64(dataIndex + 1, 4) + 1;
 					dataIndex += 5;
 					count++;
 				}
-				else if (substr == "!")
+				else if (ascii == 33) // "!"
 				{
 					// Filler
 					fillCount = parseBase64(dataIndex + 1, 4) + 1;
@@ -114,7 +105,7 @@ shared class ServerLoadCfgMap : ServerLoadStep
 				else
 				{
 					// Block
-					block = parseBase64(dataIndex, 4);
+					SColor block = parseBase64(dataIndex, 4);
 					block.setAlpha(255);
 
 					map.SetBlockInit(mapIndex++, block);
@@ -131,6 +122,10 @@ shared class ServerLoadCfgMap : ServerLoadStep
 				count++;
 			}
 		}
+
+		// Cleanup
+		base64Values.clear();
+		data = "";
 
 		complete = true;
 		print("Generated map! " + formatDuration(getGameTime() - startTick, true));
