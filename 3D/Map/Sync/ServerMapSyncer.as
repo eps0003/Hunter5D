@@ -6,11 +6,6 @@ shared class ServerMapSyncer
 	private dictionary packetsSynced;
 
 	private u16 totalPackets;
-	private SColor block;
-	private CBitStream bs;
-	private uint firstBlock;
-	private uint lastBlock;
-	private uint airCount = 0;
 
 	private Map@ map = Map::getMap();
 	private CRules@ rules = getRules();
@@ -39,7 +34,8 @@ shared class ServerMapSyncer
 		CPlayer@[] players;
 
 		// dictionary getKeys() causes crash so loop through online players instead
-		for (uint i = 0; i < getPlayerCount(); i++)
+		uint n = getPlayerCount();
+		for (uint i = 0; i < n; i++)
 		{
 			CPlayer@ player = getPlayer(i);
 			if (player is null || isSynced(player)) continue;
@@ -60,16 +56,18 @@ shared class ServerMapSyncer
 		CPlayer@[] players = getPlayersNotSynced();
 		if (players.empty()) return;
 
-		bs.Clear();
+		CBitStream bs;
 
 		// Get range of blocks to sync
-		firstBlock = packetIndex * blocksPerPacket;
-		lastBlock = Maths::Min(firstBlock + blocksPerPacket, map.blockCount);
+		uint firstBlock = packetIndex * blocksPerPacket;
+		uint lastBlock = Maths::Min(firstBlock + blocksPerPacket, map.blockCount);
+
+		uint airCount = 0;
 
 		// Loop through these blocks and serialize
 		for (uint i = firstBlock; i < lastBlock; i++)
 		{
-			block = map.getBlock(i);
+			SColor block = map.getBlock(i);
 
 			// Count air blocks
 			if (!map.isVisible(block))
@@ -107,7 +105,8 @@ shared class ServerMapSyncer
 
 		// Sync to players
 		// dictionary getKeys() causes crash so loop through online players instead
-		for (uint i = 0; i < players.size(); i++)
+		uint n = players.size();
+		for (uint i = 0; i < n; i++)
 		{
 			CPlayer@ player = players[i];
 			string username = player.getUsername();
