@@ -38,7 +38,6 @@ shared class PhysicalActor : Actor, Collision
 	private CControls@ controls = getControls();
 	private Camera@ camera = Camera::getCamera();
 	private Mouse@ mouse = Mouse::getMouse();
-	private Map@ map = Map::getMap();
 
 	PhysicalActor(u16 id, CPlayer@ player, Vec3f position)
 	{
@@ -91,7 +90,6 @@ shared class PhysicalActor : Actor, Collision
 			if (Maths::Abs(velocity.z) < 0.001f) velocity.z = 0;
 
 			this.Collision();
-			BlockPlacement();
 		}
 	}
 
@@ -102,6 +100,11 @@ shared class PhysicalActor : Actor, Collision
 			camera.position = position + cameraPosition;
 			camera.rotation = rotation;
 		}
+	}
+
+	void Draw()
+	{
+
 	}
 
 	private void Rotation()
@@ -169,44 +172,6 @@ shared class PhysicalActor : Actor, Collision
 		}
 	}
 
-	private void BlockPlacement()
-	{
-		if (!mouse.isInControl()) return;
-
-		CBlob@ blob = player.getBlob();
-		if (blob is null) return;
-
-		// Destroy block
-		if (blob.isKeyJustPressed(key_action2))
-		{
-			Ray ray(position + cameraPosition, rotation.dir());
-			RaycastInfo@ raycastInfo;
-			if (ray.raycastBlock(10, @raycastInfo))
-			{
-				Vec3f blockPos = raycastInfo.hitWorldPos;
-				map.ClientSetBlock(raycastInfo.hitWorldPos, 0);
-				print("Destroyed block at " + blockPos.toString());
-			}
-		}
-
-		// Place block
-		if (blob.isKeyJustPressed(key_action1))
-		{
-			Ray ray(position + cameraPosition, rotation.dir());
-			RaycastInfo@ raycastInfo;
-			if (ray.raycastBlock(10, @raycastInfo))
-			{
-				Vec3f blockPos = raycastInfo.hitWorldPos + raycastInfo.normal;
-				if (map.isValidBlock(blockPos) && !map.isVisible(map.getBlock(blockPos)))
-				{
-					SColor block = SColor(255, 255, 150, 150);
-					map.ClientSetBlock(blockPos, block);
-					print("Placed block at " + blockPos.toString());
-				}
-			}
-		}
-	}
-
 	void Render()
 	{
 		if (isClient())
@@ -217,11 +182,12 @@ shared class PhysicalActor : Actor, Collision
 			interRotation = prevRotation.lerpAngle(rotation, t);
 		}
 
-		if (player.isMyPlayer())
+		if (player.isMyPlayer() && !g_videorecording)
 		{
 			GUI::DrawText(interPosition.toString(), Vec2f(10, 10), color_white);
 		}
-		else
+
+		if (!player.isMyPlayer())
 		{
 			model.Render();
 		}
@@ -320,5 +286,23 @@ shared class PhysicalActor : Actor, Collision
 			hasCollisionFlags(CollisionFlag::Blocks) &&
 			collider.enteringBlock(position, position + Vec3f(0, -0.001f, 0))
 		);
+	}
+
+	void DrawCrosshair(int spacing, int length, int thickness, SColor color)
+	{
+		Vec2f center = getDriver().getScreenCenterPos();
+
+		Vec2f x1(length + spacing, thickness);
+		Vec2f x2(spacing, -thickness);
+		Vec2f y1(thickness, length + spacing);
+		Vec2f y2(-thickness, spacing);
+
+		//left/right
+		GUI::DrawRectangle(center - x1, center - x2, color);
+		GUI::DrawRectangle(center + x2, center + x1, color);
+
+		//top/bottom
+		GUI::DrawRectangle(center - y1, center - y2, color);
+		GUI::DrawRectangle(center + y2, center + y1, color);
 	}
 }

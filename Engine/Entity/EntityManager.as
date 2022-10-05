@@ -253,6 +253,14 @@ shared class EntityManager
 			entities[i].Render();
 		}
 	}
+
+	void DrawEntities()
+	{
+		for (uint i = 0; i < entities.size(); i++)
+		{
+			entities[i].Draw();
+		}
+	}
 }
 
 namespace Entity

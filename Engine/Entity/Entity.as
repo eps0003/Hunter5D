@@ -62,6 +62,11 @@ shared class Entity
 
 	}
 
+	void Draw()
+	{
+
+	}
+
 	void SerializeInit(CBitStream@ bs)
 	{
 		bs.write_u16(id);

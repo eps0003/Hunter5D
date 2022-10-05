@@ -2,6 +2,7 @@
 #include "Entity2.as"
 #include "SpectatorActor.as"
 #include "PhysicalActor.as"
+#include "SandboxActor.as"
 
 shared Entity@ getEntity(u8 type)
 {
@@ -15,6 +16,8 @@ shared Entity@ getEntity(u8 type)
 		return SpectatorActor();
 	case EntityType::PhysicalActor:
 		return PhysicalActor();
+	case EntityType::SandboxActor:
+		return SandboxActor();
 	}
 	return null;
 }
@@ -24,5 +27,6 @@ shared enum EntityType
 	Entity1,
 	Entity2,
 	SpectatorActor,
-	PhysicalActor
+	PhysicalActor,
+	SandboxActor
 }

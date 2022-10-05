@@ -24,6 +24,11 @@ void onInit(CRules@ this)
 	renderId = Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
 }
 
+void onRender(CRules@ this)
+{
+	entityManager.DrawEntities();
+}
+
 void Render(int id)
 {
 	Render::SetAlphaBlend(false);

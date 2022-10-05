@@ -124,7 +124,10 @@ shared class SpectatorActor : Actor
 			camera.position = pos;
 			camera.rotation = rot;
 
-			GUI::DrawText(pos.toString(), Vec2f(10, 10), color_white);
+			if (!g_videorecording)
+			{
+				GUI::DrawText(pos.toString(), Vec2f(10, 10), color_white);
+			}
 		}
 	}
 
