@@ -5,7 +5,7 @@ shared class ServerMapSyncer
 	private u16 packetIndex = 0;
 	private dictionary packetsSynced;
 
-	private u16 totalPackets;
+	private u16 totalPackets = 0;
 
 	private Map@ map = Map::getMap();
 	private CRules@ rules = getRules();
@@ -46,15 +46,16 @@ shared class ServerMapSyncer
 		return players;
 	}
 
-	void Init()
-	{
-		totalPackets = Maths::Ceil(map.blockCount / float(blocksPerPacket));
-	}
-
 	void Sync()
 	{
 		CPlayer@[] players = getPlayersNotSynced();
 		if (players.empty()) return;
+
+		// Initialize total packet count
+		if (totalPackets == 0)
+		{
+			totalPackets = Maths::Ceil(map.blockCount / float(blocksPerPacket));
+		}
 
 		CBitStream bs;
 
