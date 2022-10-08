@@ -4,10 +4,14 @@
 #include "ClientReceiveMap.as"
 #include "ClientGenerateChunks.as"
 #include "FlatMap.as"
+#include "ModChatCommands.as"
 
 void onInit(CRules@ this)
 {
 	onRestart(this);
+
+	ChatCommands::RegisterCommand(FOVCommand());
+	ChatCommands::RegisterCommand(RenderDistanceCommand());
 }
 
 void onRestart(CRules@ this)
