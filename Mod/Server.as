@@ -1,4 +1,5 @@
-#include "PhysicalActor.as"
+#include "SandboxActor.as"
+#include "SpectatorActor.as"
 #include "Utilities.as"
 
 #define SERVER_ONLY
@@ -23,6 +24,7 @@ void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
 	if (currentTeam != newTeam)
 	{
 		player.server_setTeamNum(newTeam);
+		SpawnPlayer(this, player, SPAWN_POSITION);
 	}
 }
 
@@ -33,20 +35,31 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		CPlayer@ player;
 		if (!saferead_player(params, @player)) return;
 
-		SpawnPlayer(player, SPAWN_POSITION);
+		SpawnPlayer(this, player, SPAWN_POSITION);
 	}
 }
 
 void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
 {
-	SpawnPlayer(victim, SPAWN_POSITION);
+	SpawnPlayer(this, victim, SPAWN_POSITION);
 }
 
-void SpawnPlayer(CPlayer@ player, Vec3f position)
+void SpawnPlayer(CRules@ this, CPlayer@ player, Vec3f position)
 {
 	if (entityManager.actorExists(player))
 	{
 		entityManager.RemoveActor(player);
 	}
 
+	Actor@ actor;
+	if (player.getTeamNum() == this.getSpectatorTeamNum())
+	{
+		@actor = SpectatorActor(getUniqueId(), player, position);
+	}
+	else
+	{
+		@actor = SandboxActor(getUniqueId(), player, position);
+	}
+
+	entityManager.AddEntity(actor);
 }
