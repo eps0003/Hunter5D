@@ -37,7 +37,16 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 }
 
+void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
+{
+	SpawnPlayer(victim, SPAWN_POSITION);
+}
+
 void SpawnPlayer(CPlayer@ player, Vec3f position)
 {
-	entityManager.AddEntity(PhysicalActor(getUniqueId(), player, position));
+	if (entityManager.actorExists(player))
+	{
+		entityManager.RemoveActor(player);
+	}
+
 }
