@@ -50,8 +50,6 @@ shared class MapRenderer
 
 		Vec3f worldPos = map.indexToPos(index);
 		Vec3f chunkPos = worldPosToChunkPos(worldPos);
-		Chunk@ chunk = getChunkSafe(chunkPos);
-		if (chunk is null) return;
 
 		int x = worldPos.x;
 		int y = worldPos.y;
@@ -126,6 +124,9 @@ shared class MapRenderer
 		}
 
 		// Rebuild this chunk and adjacent chunks if required
+
+		Chunk@ chunk = getChunkSafe(chunkPos);
+		if (chunk is null) return;
 
 		chunk.Rebuild();
 

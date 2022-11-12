@@ -19,6 +19,14 @@ void onRestart(CRules@ this)
 	@clientMapSyncer = Map::getClientSyncer();
 }
 
+void onTick(CRules@ this)
+{
+	if (isClient() && clientMapSyncer.isSynced())
+	{
+		clientMapSyncer.SetQueuedBlocks();
+	}
+}
+
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
 	if (!isServer() && cmd == this.getCommandID("sync map"))
@@ -65,6 +73,6 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 			if (getLocalPlayer().getNetworkID() == id) return;
 		}
 
-		map.SetBlock(index, block);
+		clientMapSyncer.EnqueueBlock(index, block);
 	}
 }

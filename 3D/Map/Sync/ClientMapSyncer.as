@@ -15,6 +15,9 @@ shared class ClientMapSyncer
 
 	private uint val;
 
+	private int[] indicesToPlace;
+	private SColor[] blocksToPlace;
+
 	bool isSynced()
 	{
 		return map.blockCount > 0 && blocksSynced >= map.blockCount;
@@ -116,5 +119,22 @@ shared class ClientMapSyncer
 				}
 			}
 		}
+	}
+
+	void EnqueueBlock(int index, SColor block)
+	{
+		indicesToPlace.push_back(index);
+		blocksToPlace.push_back(block);
+	}
+
+	void SetQueuedBlocks()
+	{
+		for (uint i = 0; i < blocksToPlace.size(); i++)
+		{
+			map.SetBlock(indicesToPlace[i], blocksToPlace[i]);
+		}
+
+		indicesToPlace.clear();
+		blocksToPlace.clear();
 	}
 }
