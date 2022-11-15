@@ -6,6 +6,12 @@
 #include "FlatMap.as"
 #include "ModChatCommands.as"
 
+uint mapIndex = 0;
+const string[] maps = {
+	"ephtracy.cfg",
+	"Arab.cfg"
+};
+
 void onInit(CRules@ this)
 {
 	onRestart(this);
@@ -16,8 +22,11 @@ void onInit(CRules@ this)
 
 void onRestart(CRules@ this)
 {
+	string map = maps[mapIndex];
+	mapIndex = (mapIndex + 1) % maps.size();
+
 	LoadingManager@ loadingManager = Loading::getManager();
-	loadingManager.AddStep(ServerLoadCfgMap("ephtracy.cfg"));
+	loadingManager.AddStep(ServerLoadCfgMap(map));
 	if (!isLocalHost()) loadingManager.AddStep(ClientReceiveMap());
 	loadingManager.AddStep(ClientGenerateChunks());
 }

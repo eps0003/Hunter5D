@@ -4,9 +4,8 @@
 
 #define SERVER_ONLY
 
-const Vec3f SPAWN_POSITION = Vec3f(4, 10, 4);
-
 EntityManager@ entityManager;
+Map@ map;
 
 void onRestart(CRules@ this)
 {
@@ -16,6 +15,7 @@ void onRestart(CRules@ this)
 void onInit(CRules@ this)
 {
 	@entityManager = Entity::getManager();
+	@map = Map::getMap();
 }
 
 void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
@@ -24,7 +24,7 @@ void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
 	if (currentTeam != newTeam)
 	{
 		player.server_setTeamNum(newTeam);
-		SpawnPlayer(this, player, SPAWN_POSITION);
+		SpawnPlayer(this, player);
 	}
 }
 
@@ -35,17 +35,19 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		CPlayer@ player;
 		if (!saferead_player(params, @player)) return;
 
-		SpawnPlayer(this, player, SPAWN_POSITION);
+		SpawnPlayer(this, player);
 	}
 }
 
 void onPlayerDie(CRules@ this, CPlayer@ victim, CPlayer@ attacker, u8 customData)
 {
-	SpawnPlayer(this, victim, SPAWN_POSITION);
+	SpawnPlayer(this, victim);
 }
 
-void SpawnPlayer(CRules@ this, CPlayer@ player, Vec3f position)
+void SpawnPlayer(CRules@ this, CPlayer@ player)
 {
+	Vec3f position = map.dimensions * Vec3f(0.5f, 1.0f, 0.5f);
+
 	if (entityManager.actorExists(player))
 	{
 		entityManager.RemoveActor(player);
