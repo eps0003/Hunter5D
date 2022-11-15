@@ -47,7 +47,7 @@ void DrawLoadingBar(CRules@ this)
 	uint halfWidth = getScreenWidth() * 0.4f;
 
 	string text = step.getMessage();
-	float progress = step.getProgress();
+	float progress = getPlaceboProgress(step.getProgress());
 
 	Vec2f textDim;
 	GUI::GetTextDimensions(text, textDim);
@@ -57,4 +57,24 @@ void DrawLoadingBar(CRules@ this)
 
 	GUI::DrawProgressBar(tl, br, progress);
 	GUI::DrawTextCentered(text, center, color_white);
+}
+
+float getPlaceboProgress(float progress)
+{
+	// Fast later (larger = stronger)
+	// float placeboStrength = 2.0f;
+	// return 1 - Maths::Pow(1 - progress, placeboStrength);
+
+	// Fast initially (smaller = stronger)
+	float placeboStrength = 0.5f;
+	return Maths::Pow(progress, placeboStrength);
+
+	// Custom curve with slight end bias (smaller = stronger)
+	// float placeboStrength = 0.1f;
+	// return (Maths::Pow(placeboStrength, progress) - 1) / (placeboStrength - 1);
+
+	// Perfect curve (larger = stronger)
+	// https://math.stackexchange.com/a/4277261
+	// float placeboStrength = 1.5f;
+	// return Maths::Pow(1 - Maths::Pow(1 - x, placeboStrength), 1.0f / placeboStrength);
 }
