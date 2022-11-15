@@ -3,13 +3,16 @@
 #include "ServerLoadCfgMap.as"
 #include "ClientReceiveMap.as"
 #include "ClientGenerateChunks.as"
-#include "FlatMap.as"
 #include "ModChatCommands.as"
 
 uint mapIndex = 0;
 const string[] maps = {
-	"ephtracy.cfg",
-	"Arab.cfg"
+	"AcidCrackMeth.cfg",
+	"Aquila.cfg",
+	"Broville.cfg",
+	"De_Dust2.cfg",
+	"Normandie.cfg",
+	"SkullFort.cfg"
 };
 
 void onInit(CRules@ this)
