@@ -1,6 +1,6 @@
 shared class ServerMapSyncer
 {
-	private uint blocksPerPacket = 30000;
+	private uint blocksPerPacket = 20000;
 
 	private u16 packetIndex = 0;
 	private dictionary packetsSynced;
