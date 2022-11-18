@@ -112,10 +112,14 @@ shared class ClientMapSyncer
 			{
 				x -= map.dimensions.x;
 				z++;
-				if (z == map.dimensions.z)
+				while (z >= map.dimensions.z)
 				{
-					z = 0;
+					z -= map.dimensions.z;
 					y++;
+					while (y >= map.dimensions.y)
+					{
+						y -= map.dimensions.y;
+					}
 				}
 			}
 		}
