@@ -30,7 +30,7 @@ void onPlayerRequestTeamChange(CRules@ this, CPlayer@ player, u8 newTeam)
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (cmd == this.getCommandID("player loaded"))
+	if (Command::equals(cmd, "player loaded"))
 	{
 		CPlayer@ player;
 		if (!saferead_player(params, @player)) return;

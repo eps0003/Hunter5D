@@ -6,9 +6,9 @@ ClientMapSyncer@ clientMapSyncer;
 
 void onInit(CRules@ this)
 {
-	this.addCommandID("sync map");
-	this.addCommandID("client set block");
-	this.addCommandID("server set block");
+	Command::Add("sync map");
+	Command::Add("client set block");
+	Command::Add("server set block");
 
 	onRestart(this);
 }
@@ -29,11 +29,11 @@ void onTick(CRules@ this)
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (!isServer() && cmd == this.getCommandID("sync map"))
+	if (!isServer() && Command::equals(cmd, "sync map"))
 	{
 		clientMapSyncer.ReceivePacket(params);
 	}
-	else if (isServer() && cmd == this.getCommandID("server set block"))
+	else if (isServer() && Command::equals(cmd, "server set block"))
 	{
 		uint index;
 		if (!params.saferead_u32(index)) return;
@@ -54,10 +54,10 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 			CBitStream bs;
 			bs.write_u32(index);
 			bs.write_u32(map.getBlock(index).color);
-			this.SendCommand(this.getCommandID("client set block"), bs, player);
+			Command::Send("client set block", bs, player);
 		}
 	}
-	else if (isClient() && cmd == this.getCommandID("client set block"))
+	else if (isClient() && Command::equals(cmd, "client set block"))
 	{
 		uint index;
 		if (!params.saferead_u32(index)) return;

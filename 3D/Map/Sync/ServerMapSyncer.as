@@ -124,7 +124,7 @@ shared class ServerMapSyncer
 			bsWithSize.write_u32(bsToSync.getBitsUsed());
 			bsWithSize.writeBitStream(bsToSync, 0, bsToSync.getBitsUsed());
 
-			rules.SendCommand(rules.getCommandID("sync map"), bsWithSize, player);
+			Command::Send("sync map", bsWithSize, player);
 
 			packetsSynced.set(username, packetCount + 1);
 		}

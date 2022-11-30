@@ -79,7 +79,7 @@ shared class LoadingManager
 			{
 				CBitStream bs;
 				serverStep.Serialize(bs);
-				rules.SendCommand(rules.getCommandID("sync load step"), bs, true);
+				Command::Send("sync load step", bs, true);
 			}
 		}
 
@@ -173,7 +173,7 @@ shared class LoadingManager
 		{
 			CBitStream bs;
 			bs.write_netid(player.getNetworkID());
-			rules.SendCommand(rules.getCommandID("player loaded"), bs, true);
+			Command::Send("player loaded", bs, true);
 		}
 	}
 

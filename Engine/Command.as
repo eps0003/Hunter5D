@@ -1,6 +1,6 @@
 namespace Command
 {
-	bool unwrap(CBitStream@ params, bool thisGameOnly = false)
+	shared bool unwrap(CBitStream@ params, bool thisGameOnly = false)
 	{
 		u8 gameIndex;
 		if (!params.saferead_u8(gameIndex)) return false;
@@ -19,7 +19,7 @@ namespace Command
 		return true;
 	}
 
-	CBitStream wrap(CBitStream@ params)
+	shared CBitStream wrap(CBitStream@ params)
 	{
 		CBitStream bs;
 		bs.write_u8(getRules().get_u8("game index"));
@@ -28,23 +28,23 @@ namespace Command
 		return bs;
 	}
 
-	bool equals(u8 cmd, string cmdName)
+	shared bool equals(u8 cmd, string cmdName)
 	{
 		return cmd == getRules().getCommandID(cmdName);
 	}
 
-	void Add(string cmdName)
+	shared void Add(string cmdName)
 	{
 		getRules().addCommandID(cmdName);
 	}
 
-	void Send(string cmdName, CBitStream &in params, bool sendToClients = true)
+	shared void Send(string cmdName, CBitStream &in params, bool sendToClients = true)
 	{
 		CRules@ rules = getRules();
 		rules.SendCommand(rules.getCommandID(cmdName), params, sendToClients);
 	}
 
-	void Send(string cmdName, CBitStream &in params, CPlayer@ player)
+	shared void Send(string cmdName, CBitStream &in params, CPlayer@ player)
 	{
 		CRules@ rules = getRules();
 		rules.SendCommand(rules.getCommandID(cmdName), params, player);

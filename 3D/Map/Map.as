@@ -72,7 +72,7 @@ shared class Map
 			bs.write_u32(index);
 			bs.write_u32(block.color);
 			bs.write_netid(player.getNetworkID());
-			rules.SendCommand(rules.getCommandID("server set block"), bs, false);
+			Command::Send("server set block", bs);
 		}
 	}
 
@@ -124,7 +124,7 @@ shared class Map
 			bs.write_u32(index);
 			bs.write_u32(block.color);
 			bs.write_netid(player.getNetworkID());
-			rules.SendCommand(rules.getCommandID("client set block"), bs, true);
+			Command::Send("client set block", bs, true);
 		}
 
 		if (isClient())

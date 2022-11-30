@@ -4,8 +4,8 @@ LoadingManager@ loadingManager;
 
 void onInit(CRules@ this)
 {
-	this.addCommandID("player loaded");
-	this.addCommandID("sync load step");
+	Command::Add("player loaded");
+	Command::Add("sync load step");
 
 	onRestart(this);
 }
@@ -30,7 +30,7 @@ void onPlayerLeave(CRules@ this, CPlayer@ player)
 
 void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 {
-	if (cmd == this.getCommandID("player loaded"))
+	if (Command::equals(cmd, "player loaded"))
 	{
 		CPlayer@ player;
 		if (!saferead_player(params, @player)) return;
@@ -39,7 +39,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 
 		loadingManager.SetPlayerLoaded(player);
 	}
-	else if (!isServer() && cmd == this.getCommandID("sync load step"))
+	else if (!isServer() && Command::equals(cmd, "sync load step"))
 	{
 		LoadStep@ step = loadingManager.getCurrentStep();
 		if (step is null) return;

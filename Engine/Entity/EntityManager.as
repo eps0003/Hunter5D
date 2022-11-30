@@ -59,7 +59,7 @@ shared class EntityManager
 			CBitStream bs;
 			bs.write_u8(type);
 			entity.SerializeInit(bs);
-			rules.SendCommand(rules.getCommandID("create entity"), bs, true);
+			Command::Send("create entity", bs, true);
 		}
 	}
 
@@ -108,7 +108,7 @@ shared class EntityManager
 		{
 			CBitStream bs;
 			bs.write_u16(id);
-			rules.SendCommand(rules.getCommandID("remove entity"), bs, true);
+			Command::Send("remove entity", bs, true);
 		}
 
 		entities.removeAt(index);
@@ -168,7 +168,7 @@ shared class EntityManager
 			{
 				CBitStream bs;
 				entity.SerializeTick(bs);
-				rules.SendCommand(rules.getCommandID("sync entity"), bs, true);
+				Command::Send("sync entity", bs, true);
 			}
 
 			Actor@ actor = cast<Actor>(entity);
@@ -176,7 +176,7 @@ shared class EntityManager
 			{
 				CBitStream bs;
 				actor.SerializeTickClient(bs);
-				rules.SendCommand(rules.getCommandID("sync actor"), bs, true);
+				Command::Send("sync actor", bs, true);
 			}
 		}
 	}
