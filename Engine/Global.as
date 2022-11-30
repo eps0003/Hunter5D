@@ -20,6 +20,12 @@ void onRestart(CRules@ this)
 		@driver = getDriver();
 	}
 
+	if (isServer())
+	{
+		this.add_u8("game index", 1);
+		this.Sync("game index", true);
+	}
+
 	this.set("mouse", null);
 
 	this.set("entity manager", null);
