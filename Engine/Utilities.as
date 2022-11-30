@@ -55,16 +55,6 @@ shared string formatDuration(float duration, bool showMilliseconds = false)
 	return text;
 }
 
-shared bool isNextMap()
-{
-	return getRules().get_bool("nextmap");
-}
-
-shared bool isRestartMap()
-{
-	return !isNextMap();
-}
-
 shared void RestartMap()
 {
 	LoadMap(getMap().getMapName());

@@ -5,7 +5,7 @@ void RunServer()
 	if (getNet().CreateServer())
 	{
 		LoadRules("Rules.cfg");
-		LoadMapCycle("Map.cfg");
+		LoadMapCycle("Mapcycle.cfg");
 		LoadNextMap();
 	}
 }

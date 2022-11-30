@@ -5,16 +5,6 @@
 #include "ClientGenerateChunks.as"
 #include "ModChatCommands.as"
 
-uint mapIndex = 0;
-const string[] maps = {
-	"AcidCrackMeth.cfg",
-	"Aquila.cfg",
-	"Broville.cfg",
-	"De_Dust2.cfg",
-	"Normandie.cfg",
-	"SkullFort.cfg"
-};
-
 void onInit(CRules@ this)
 {
 	onRestart(this);
@@ -25,11 +15,8 @@ void onInit(CRules@ this)
 
 void onRestart(CRules@ this)
 {
-	string map = maps[mapIndex];
-	mapIndex = (mapIndex + 1) % maps.size();
-
 	LoadingManager@ loadingManager = Loading::getManager();
-	loadingManager.AddStep(ServerLoadCfgMap(map));
+	loadingManager.AddStep(ServerLoadCfgMap(getMap().getMapName()));
 	if (!isLocalHost()) loadingManager.AddStep(ClientReceiveMap());
 	loadingManager.AddStep(ClientGenerateChunks());
 }
