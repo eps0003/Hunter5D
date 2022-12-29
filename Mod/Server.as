@@ -1,4 +1,4 @@
-#include "SandboxActor.as"
+#include "HunterActor.as"
 #include "SpectatorActor.as"
 #include "Utilities.as"
 
@@ -60,7 +60,7 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 	}
 	else
 	{
-		@actor = SandboxActor(getUniqueId(), player, position);
+		@actor = HunterActor(getUniqueId(), player, position);
 	}
 
 	entityManager.AddEntity(actor);
