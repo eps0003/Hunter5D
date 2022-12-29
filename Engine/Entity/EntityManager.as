@@ -172,7 +172,7 @@ shared class EntityManager
 			}
 
 			Actor@ actor = cast<Actor>(entity);
-			if (actor !is null && actor.getPlayer().isMyPlayer() && !isServer())
+			if (actor !is null && actor.isMyActor() && !isServer())
 			{
 				CBitStream bs;
 				actor.SerializeTickClient(bs);
@@ -227,7 +227,7 @@ shared class EntityManager
 			}
 
 			Actor@ actor = cast<Actor>(entity);
-			if (actor !is null && !actor.getPlayer().isMyPlayer())
+			if (actor !is null && !actor.isMyActor())
 			{
 				CBitStream@ bs;
 				if (packets.get("actor" + actor.getId(), @bs))

@@ -78,7 +78,7 @@ shared class PhysicalActor : Actor, Collision
 
 	void Update()
 	{
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			// Gravity
 			velocity.y += gravity;
@@ -97,16 +97,11 @@ shared class PhysicalActor : Actor, Collision
 
 	void PostUpdate()
 	{
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			camera.position = position + cameraPosition;
 			camera.rotation = rotation;
 		}
-	}
-
-	void Draw()
-	{
-
 	}
 
 	private void Rotation()
@@ -184,12 +179,12 @@ shared class PhysicalActor : Actor, Collision
 			interRotation = prevRotation.lerpAngle(rotation, t);
 		}
 
-		if (player.isMyPlayer() && !g_videorecording)
+		if (isMyActor() && !g_videorecording)
 		{
 			GUI::DrawText(interPosition.toString(), Vec2f(10, 10), color_white);
 		}
 
-		if (!player.isMyPlayer())
+		if (!isMyActor())
 		{
 			model.Render();
 		}

@@ -32,7 +32,7 @@ shared class SandboxActor : PhysicalActor
 	{
 		PhysicalActor::Update();
 
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			ChangeBlockColor();
 			BlockPlacement();
@@ -41,7 +41,7 @@ shared class SandboxActor : PhysicalActor
 
 	void Draw()
 	{
-		if (player.isMyPlayer() && !g_videorecording)
+		if (isMyActor() && !g_videorecording)
 		{
 			DrawCrosshair(0, 8, 1, color_white);
 

@@ -40,7 +40,7 @@ shared class SpectatorActor : Actor
 
 	void Update()
 	{
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			// Movement
 			Vec2f dir;
@@ -75,7 +75,7 @@ shared class SpectatorActor : Actor
 
 	void Render()
 	{
-		if (player.isMyPlayer())
+		if (isMyActor())
 		{
 			float t = Interpolation::getFrameTime();
 			Vec3f pos = prevPosition.lerp(position, t);

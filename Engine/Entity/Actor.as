@@ -16,6 +16,11 @@ shared class Actor : Entity
 		return player;
 	}
 
+	bool isMyActor()
+	{
+		return player.isMyPlayer();
+	}
+
 	u8 getTeamNum()
 	{
 		return player.getTeamNum();
