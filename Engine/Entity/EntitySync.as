@@ -72,7 +72,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	{
 		entityManager.DeserializeEntity(params);
 	}
-	else if (!isServer() && Command::equals(cmd, "sync actor"))
+	else if (Command::equals(cmd, "sync actor"))
 	{
 		entityManager.DeserializeActor(params);
 	}
