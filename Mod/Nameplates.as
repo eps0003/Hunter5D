@@ -39,8 +39,12 @@ void onRender(CRules@ this)
 		Vec2f screenPos = worldPos.projectToScreen();
 
 		CTeam@ team = this.getTeam(player.getTeamNum());
-		SColor color = team !is null ? team.color : color_white;
+		SColor nameColor = team !is null ? team.color : color_white;
 
-		GUI::DrawTextCentered(player.getCharacterName(), screenPos, color);
+		string health = "" + Maths::Ceil(actor.getHealthPercentage() * 100) + "%";
+		SColor healthColor = SColor().getInterpolated_quadratic(SColor(255, 255, 0, 0), color_white, actor.getHealthPercentage());
+
+		GUI::DrawTextCentered(player.getCharacterName(), screenPos - Vec2f(0.0f, 14.0f), nameColor);
+		GUI::DrawTextCentered(health, screenPos, healthColor);
 	}
 }

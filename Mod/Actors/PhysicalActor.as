@@ -8,6 +8,7 @@
 #include "Collision.as"
 #include "ActorModel.as"
 #include "PhysicalActorRunAnim.as"
+#include "Health.as"
 
 shared class PhysicalActor : Actor, Collision
 {
@@ -27,6 +28,7 @@ shared class PhysicalActor : Actor, Collision
 	private u8 collisionFlags = 0;
 
 	private ActorModel@ model;
+	private Health health;
 
 	private Vec3f cameraPosition = Vec3f(0, 1.6f, 0);
 
@@ -214,12 +216,14 @@ shared class PhysicalActor : Actor, Collision
 	{
 		Actor::SerializeTick(bs);
 		bs.write_u8(collisionFlags);
+		health.SerializeTick(bs);
 	}
 
 	bool deserializeTick(CBitStream@ bs)
 	{
 		if (!Actor::deserializeTick(bs)) return false;
 		if (!bs.saferead_u8(collisionFlags)) return false;
+		if (!health.deserializeTick(bs)) return false;
 		return true;
 	}
 
@@ -230,6 +234,7 @@ shared class PhysicalActor : Actor, Collision
 		rotation.Serialize(bs);
 		velocity.Serialize(bs);
 		bs.write_u8(collisionFlags);
+		health.SerializeInit(bs);
 	}
 
 	bool deserializeInit(CBitStream@ bs)
@@ -239,6 +244,7 @@ shared class PhysicalActor : Actor, Collision
 		if (!rotation.deserialize(bs)) return false;
 		if (!velocity.deserialize(bs)) return false;
 		if (!bs.saferead_u8(collisionFlags)) return false;
+		if (!health.deserializeInit(bs)) return false;
 		return true;
 	}
 
@@ -304,5 +310,53 @@ shared class PhysicalActor : Actor, Collision
 		//top/bottom
 		GUI::DrawRectangle(center - y1, center - y2, color);
 		GUI::DrawRectangle(center + y2, center + y1, color);
+	}
+
+	u8 getHealth()
+	{
+		return health.getHealth();
+	}
+
+	u8 getMaxHealth()
+	{
+		return health.getMaxHealth();
+	}
+
+	float getHealthPercentage()
+	{
+		return health.getHealthPercentage();
+	}
+
+	void SetHealth(u8 val)
+	{
+		health.SetHealth(val);
+		if (health.hasNoHealth())
+		{
+			Kill();
+		}
+	}
+
+	void SetMaxHealth()
+	{
+		health.SetMaxHealth();
+	}
+
+	void AddHealth(u8 val)
+	{
+		health.AddHealth(val);
+		if (health.hasNoHealth())
+		{
+			Kill();
+		}
+	}
+
+	bool hasNoHealth()
+	{
+		return health.hasNoHealth();
+	}
+
+	bool hasFullHealth()
+	{
+		return health.hasFullHealth();
 	}
 }
