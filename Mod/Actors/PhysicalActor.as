@@ -179,14 +179,17 @@ shared class PhysicalActor : Actor, Collision
 			interRotation = prevRotation.lerpAngle(rotation, t);
 		}
 
-		if (isMyActor() && !g_videorecording)
-		{
-			GUI::DrawText(interPosition.toString(), Vec2f(10, 10), color_white);
-		}
-
 		if (!isMyActor())
 		{
 			model.Render();
+		}
+	}
+
+	void Draw()
+	{
+		if (isMyActor() && !g_videorecording)
+		{
+			GUI::DrawText(interPosition.toString(), Vec2f(10, 10), color_white);
 		}
 	}
 

@@ -24,6 +24,10 @@ shared class HunterActor : PhysicalActor
 
 	void Draw()
 	{
+		PhysicalActor::Draw();
+
+		gun.Draw();
+
 		if (isMyActor() && !g_videorecording)
 		{
 			DrawCrosshair(0, 8, 1, color_white);

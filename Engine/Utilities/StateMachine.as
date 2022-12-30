@@ -10,6 +10,11 @@ shared class StateMachine : Serializable
 		states.set("" + identifier, @state);
 	}
 
+	bool isState(uint identifier)
+	{
+		return identifier == currentIdentifier;
+	}
+
 	State@ getState(uint identifier)
 	{
 		State@ state;
