@@ -16,6 +16,11 @@ shared class Actor : Entity
 		return player;
 	}
 
+	CBlob@ getBlob()
+	{
+		return player.getBlob();
+	}
+
 	bool isMyActor()
 	{
 		return player.isMyPlayer();

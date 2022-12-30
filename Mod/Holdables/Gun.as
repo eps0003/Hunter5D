@@ -14,11 +14,24 @@ shared class Gun
 	{
 		@this.actor = actor;
 
+		ShootAction shootAction(this, actor);
+		ReloadAction reloadAction(this);
+
 		states.AddState(GunStates::Readying, GunReadying(readyTime));
-		states.AddState(GunStates::Idle, GunIdle());
+		states.AddState(GunStates::Idle, GunIdle(shootAction, reloadAction));
 		states.AddState(GunStates::Shooting, GunShooting(shootTime));
-		states.AddState(GunStates::Reloading, GunReloading(reloadTime));
+		states.AddState(GunStates::Reloading, GunReloading(shootAction, reloadAction, reloadTime));
 		states.SetState(GunStates::Readying);
+	}
+
+	bool isAutomatic()
+	{
+		return true;
+	}
+
+	bool usesPellets()
+	{
+		return false;
 	}
 
 	void Update()
@@ -76,16 +89,30 @@ shared class GunReadying : State
 
 shared class GunIdle : State
 {
-	private bool automatic;
+	private ShootAction@ shootAction;
+	private ReloadAction@ reloadAction;
 
-	GunIdle(bool automatic)
+	GunIdle(ShootAction@ shootAction, ReloadAction@ reloadAction)
 	{
-		this.automatic = automatic;
+		@this.shootAction = shootAction;
+		@this.reloadAction = reloadAction;
 	}
 
 	void Enter(StateMachine@ states)
 	{
 		print("Gun Idle!");
+	}
+
+	void Tick(StateMachine@ states)
+	{
+		if (shootAction.canShoot())
+		{
+			states.SetState(GunStates::Shooting);
+		}
+		else if (reloadAction.canReload())
+		{
+			states.SetState(GunStates::Reloading);
+		}
 	}
 }
 
@@ -101,6 +128,7 @@ shared class GunShooting : State
 
 	void Enter(StateMachine@ states)
 	{
+		print("Gun Shooting!");
 		shootTimer.Start(shootTime);
 	}
 
@@ -115,25 +143,34 @@ shared class GunShooting : State
 
 shared class GunReloading : State
 {
+	private ShootAction@ shootAction;
+	private ReloadAction@ reloadAction;
 	private uint reloadTime;
-	private bool pellets;
 	private Timer reloadTimer;
 
-	GunReloading(uint reloadTime, bool pellets = false)
+	GunReloading(ShootAction@ shootAction, ReloadAction@ reloadAction, uint reloadTime)
 	{
+		@this.shootAction = shootAction;
+		@this.reloadAction = reloadAction;
 		this.reloadTime = reloadTime;
 	}
 
 	void Enter(StateMachine@ states)
 	{
+		print("Gun Reloading!");
 		reloadTimer.Start(reloadTime);
 	}
 
 	void Tick(StateMachine@ states)
 	{
+		if (reloadAction.canCancelReload() && shootAction.canShoot())
+		{
+			states.SetState(GunStates::Shooting);
+		}
+
 		if (reloadTimer.isDone())
 		{
-			if (pellets)
+			if (reloadAction.reloadsIncrementally())
 			{
 				// TODO: Increment bullet count
 				reloadTimer.Start(reloadTime);
@@ -143,13 +180,60 @@ shared class GunReloading : State
 				// TODO: Set full bullet count
 			}
 
-			// TODO: check full bullet count
-			if (true)
+			if (reloadAction.hasFinishedReloading())
 			{
 				states.SetState(GunStates::Idle);
-				return;
 			}
 		}
+	}
+}
+
+shared class ShootAction
+{
+	private Gun@ gun;
+	private PhysicalActor@ actor;
+
+	ShootAction(Gun@ gun, PhysicalActor@ actor)
+	{
+		@this.gun = gun;
+		@this.actor = actor;
+	}
+
+	bool canShoot()
+	{
+		CBlob@ blob = actor.getBlob();
+		return gun.isAutomatic() ? blob.isKeyPressed(key_action1) : blob.isKeyJustPressed(key_action1);
+	}
+}
+
+shared class ReloadAction
+{
+	private Gun@ gun;
+
+	ReloadAction(Gun@ gun)
+	{
+		@this.gun = gun;
+	}
+
+	bool canReload()
+	{
+		return getControls().isKeyPressed(KEY_KEY_R);
+	}
+
+	bool canCancelReload()
+	{
+		return gun.usesPellets();
+	}
+
+	bool reloadsIncrementally()
+	{
+		return gun.usesPellets();
+	}
+
+	bool hasFinishedReloading()
+	{
+		// TODO: Check ammo
+		return true;
 	}
 }
 

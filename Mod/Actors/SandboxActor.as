@@ -83,8 +83,7 @@ shared class SandboxActor : PhysicalActor
 	{
 		if (!mouse.isInControl()) return;
 
-		CBlob@ blob = player.getBlob();
-		if (blob is null) return;
+		CBlob@ blob = getBlob();
 
 		// Destroy block
 		if (blob.isKeyJustPressed(key_action2))
