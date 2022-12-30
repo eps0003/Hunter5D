@@ -89,6 +89,16 @@ shared class StateMachine : Serializable
 
 		return true;
 	}
+
+	string toString()
+	{
+		string text;
+		for (uint i = 0; i < states.getSize(); i++)
+		{
+			text += i == currentIdentifier ? "⬢" : "⬡";
+		}
+		return text;
+	}
 }
 
 shared class State

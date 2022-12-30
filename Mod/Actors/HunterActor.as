@@ -8,7 +8,7 @@ shared class HunterActor : PhysicalActor
 	HunterActor(u16 id, CPlayer@ player, Vec3f position)
 	{
 		super(id, player, position);
-		@gun = Gun(this);
+		@gun = getGun(GunType::SMG, this);
 	}
 
 	u8 getType()
@@ -44,7 +44,7 @@ shared class HunterActor : PhysicalActor
 	{
 		if (!PhysicalActor::deserializeInit(bs)) return false;
 
-		Gun gun(this);
+		Gun@ gun = getGun(GunType::SMG, this);
 		if (!gun.deserializeInit(bs)) return false;
 		@this.gun = gun;
 
