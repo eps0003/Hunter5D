@@ -1,17 +1,17 @@
-#include "Serializable.as"
+#include "IHealthHandler.as"
 
-shared class Health : Serializable
+shared class HealthHandler : IHealthHandler
 {
 	private u8 maxHealth;
 	private u8 health;
 
-	Health()
+	HealthHandler()
 	{
 		maxHealth = 255;
 		health = maxHealth;
 	}
 
-	Health(u8 maxHealth)
+	HealthHandler(u8 maxHealth)
 	{
 		this.maxHealth = maxHealth;
 		this.health = maxHealth;
@@ -27,45 +27,19 @@ shared class Health : Serializable
 		return maxHealth;
 	}
 
-	float getHealthPercentage()
-	{
-		return maxHealth > 0 ? health / float(maxHealth) : 0.0f;
-	}
-
 	void SetHealth(u8 health)
 	{
 		this.health = Maths::Clamp(health, 0, maxHealth);
 	}
 
-	void SetMaxHealth()
-	{
-		SetHealth(maxHealth);
-	}
-
-	void AddHealth(u8 health)
-	{
-		SetHealth(this.health + health);
-	}
-
-	bool hasNoHealth()
-	{
-		return health == 0;
-	}
-
-	bool hasFullHealth()
-	{
-		return health >= maxHealth;
-	}
-
 	void SerializeInit(CBitStream@ bs)
 	{
-		bs.write_u8(maxHealth);
 		bs.write_u8(health);
 	}
 
 	bool deserializeInit(CBitStream@ bs)
 	{
-		return bs.saferead_u8(maxHealth) && bs.saferead_u8(health);
+		return bs.saferead_u8(health);
 	}
 
 	void SerializeTick(CBitStream@ bs)

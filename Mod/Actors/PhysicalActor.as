@@ -8,7 +8,7 @@
 #include "Collision.as"
 #include "ActorModel.as"
 #include "PhysicalActorRunAnim.as"
-#include "Health.as"
+#include "HealthHandler.as"
 
 shared class PhysicalActor : Actor, Collision, ICameraController
 {
@@ -28,7 +28,9 @@ shared class PhysicalActor : Actor, Collision, ICameraController
 	private u8 collisionFlags = 0;
 
 	private ActorModel@ model;
-	private Health health;
+
+	private u8 maxHealth = 10;
+	private IHealthHandler@ healthHandler;
 
 	private Vec3f cameraOffset = Vec3f(0, 1.6f, 0);
 
@@ -46,6 +48,7 @@ shared class PhysicalActor : Actor, Collision, ICameraController
 		super(id, player);
 		this.position = position;
 		this.prevPosition = position;
+		@healthHandler = HealthHandler(maxHealth);
 	}
 
 	u8 getType()
@@ -210,14 +213,14 @@ shared class PhysicalActor : Actor, Collision, ICameraController
 	{
 		Actor::SerializeTick(bs);
 		bs.write_u8(collisionFlags);
-		health.SerializeTick(bs);
+		healthHandler.SerializeTick(bs);
 	}
 
 	bool deserializeTick(CBitStream@ bs)
 	{
 		if (!Actor::deserializeTick(bs)) return false;
 		if (!bs.saferead_u8(collisionFlags)) return false;
-		if (!health.deserializeTick(bs)) return false;
+		if (!healthHandler.deserializeTick(bs)) return false;
 		return true;
 	}
 
@@ -228,17 +231,19 @@ shared class PhysicalActor : Actor, Collision, ICameraController
 		rotation.Serialize(bs);
 		velocity.Serialize(bs);
 		bs.write_u8(collisionFlags);
-		health.SerializeInit(bs);
+		healthHandler.SerializeInit(bs);
 	}
 
 	bool deserializeInit(CBitStream@ bs)
 	{
+		@healthHandler = HealthHandler(maxHealth);
+
 		if (!Actor::deserializeInit(bs)) return false;
 		if (!position.deserialize(bs)) return false;
 		if (!rotation.deserialize(bs)) return false;
 		if (!velocity.deserialize(bs)) return false;
 		if (!bs.saferead_u8(collisionFlags)) return false;
-		if (!health.deserializeInit(bs)) return false;
+		if (!healthHandler.deserializeInit(bs)) return false;
 		return true;
 	}
 
@@ -308,50 +313,21 @@ shared class PhysicalActor : Actor, Collision, ICameraController
 
 	u8 getHealth()
 	{
-		return health.getHealth();
+		return healthHandler.getHealth();
 	}
 
 	u8 getMaxHealth()
 	{
-		return health.getMaxHealth();
-	}
-
-	float getHealthPercentage()
-	{
-		return health.getHealthPercentage();
+		return healthHandler.getMaxHealth();
 	}
 
 	void SetHealth(u8 val)
 	{
-		health.SetHealth(val);
-		if (health.hasNoHealth())
+		healthHandler.SetHealth(val);
+		if (healthHandler.getHealth() == 0)
 		{
 			Kill();
 		}
-	}
-
-	void SetMaxHealth()
-	{
-		health.SetMaxHealth();
-	}
-
-	void AddHealth(u8 val)
-	{
-		health.AddHealth(val);
-		if (health.hasNoHealth())
-		{
-			Kill();
-		}
-	}
-
-	bool hasNoHealth()
-	{
-		return health.hasNoHealth();
-	}
-
-	bool hasFullHealth()
-	{
-		return health.hasFullHealth();
 	}
 
 	Vec3f getCameraPosition()

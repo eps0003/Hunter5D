@@ -41,8 +41,13 @@ void onRender(CRules@ this)
 		CTeam@ team = this.getTeam(player.getTeamNum());
 		SColor nameColor = team !is null ? team.color : color_white;
 
-		string health = "" + Maths::Ceil(actor.getHealthPercentage() * 100) + "%";
-		SColor healthColor = SColor().getInterpolated_quadratic(SColor(255, 255, 0, 0), color_white, actor.getHealthPercentage());
+		float maxHealth = actor.getMaxHealth();
+		float healthPercentage = maxHealth > 0
+			? actor.getHealth() / float(maxHealth)
+			: 0.0f;
+
+		string health = "" + Maths::Ceil(healthPercentage * 100) + "%";
+		SColor healthColor = SColor().getInterpolated_quadratic(SColor(255, 255, 0, 0), color_white, healthPercentage);
 
 		GUI::DrawTextCentered(player.getCharacterName(), screenPos - Vec2f(0.0f, 14.0f), nameColor);
 		GUI::DrawTextCentered(health, screenPos, healthColor);
