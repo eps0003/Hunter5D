@@ -9,8 +9,9 @@
 #include "ActorModel.as"
 #include "PhysicalActorRunAnim.as"
 #include "HealthHandler.as"
+#include "INameplate.as"
 
-shared class PhysicalActor : Actor, Collision, ICameraController
+shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
 {
 	Vec3f position;
 	private Vec3f prevPosition;
@@ -334,5 +335,26 @@ shared class PhysicalActor : Actor, Collision, ICameraController
 	Vec3f getCameraRotation()
 	{
 		return rotation;
+	}
+
+	string getNameplateText()
+	{
+		return getPlayer().getCharacterName();
+	}
+
+	Vec3f getNameplatePosition()
+	{
+		return interPosition + Vec3f(0.0f, collider.dim.y + 0.4f, 0.0f);
+	}
+
+	SColor getNameplateColor()
+	{
+		CTeam@ team = getRules().getTeam(getPlayer().getTeamNum());
+		return team !is null ? team.color : color_white;
+	}
+
+	bool isNameplateVisible()
+	{
+		return true;
 	}
 }
