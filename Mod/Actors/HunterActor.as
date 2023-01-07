@@ -3,7 +3,7 @@
 
 shared class HunterActor : PhysicalActor
 {
-	private Gun@ gun;
+	private IHoldable@ gun;
 
 	HunterActor(u16 id, CPlayer@ player, Vec3f position)
 	{
@@ -54,13 +54,13 @@ shared class HunterActor : PhysicalActor
 	void SerializeTickClient(CBitStream@ bs)
 	{
 		PhysicalActor::SerializeTickClient(bs);
-		gun.SerializeTickClient(bs);
+		gun.SerializeTick(bs);
 	}
 
 	bool deserializeTickClient(CBitStream@ bs)
 	{
 		if (!PhysicalActor::deserializeTickClient(bs)) return false;
-		if (!gun.deserializeTickClient(bs)) return false;
+		if (!gun.deserializeTick(bs)) return false;
 		return true;
 	}
 }

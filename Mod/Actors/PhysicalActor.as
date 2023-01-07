@@ -30,7 +30,7 @@ shared class PhysicalActor : Actor, Collision
 	private ActorModel@ model;
 	private Health health;
 
-	private Vec3f cameraPosition = Vec3f(0, 1.6f, 0);
+	Vec3f cameraPosition = Vec3f(0, 1.6f, 0);
 
 	private float acceleration = 0.08f;
 	private float friction = 0.3f;

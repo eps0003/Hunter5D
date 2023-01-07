@@ -1,3 +1,4 @@
+#include "IHoldable.as"
 #include "StateMachine.as"
 #include "GunState.as"
 #include "ShootHandlers.as"
@@ -6,7 +7,7 @@
 #include "GunDirector.as"
 #include "Guns.as"
 
-shared class Gun
+shared class Gun : IHoldable
 {
 	Actor@ actor;
 
@@ -62,12 +63,12 @@ shared class Gun
 		return states.deserializeInit(bs);
 	}
 
-	void SerializeTickClient(CBitStream@ bs)
+	void SerializeTick(CBitStream@ bs)
 	{
 		states.SerializeTick(bs);
 	}
 
-	bool deserializeTickClient(CBitStream@ bs)
+	bool deserializeTick(CBitStream@ bs)
 	{
 		return states.deserializeTick(bs);
 	}
