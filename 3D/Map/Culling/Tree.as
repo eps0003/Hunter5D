@@ -14,7 +14,7 @@ shared class Tree
 
 	uint RenderVisibleChunks()
 	{
-		return branch.RenderVisibleChunks(camera.getFrustum(), camera.interPosition);
+		return branch.RenderVisibleChunks(camera.getFrustum(), camera.getPosition());
 	}
 }
 

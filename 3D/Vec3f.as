@@ -445,8 +445,8 @@ shared class Vec3f
 	bool isInFrontOfCamera()
 	{
 		Camera@ camera = Camera::getCamera();
-		Vec3f posDir = this - camera.position;
-		Vec3f rotDir = camera.rotation.dir();
+		Vec3f posDir = this - camera.getPosition();
+		Vec3f rotDir = camera.getRotation().dir();
 		return posDir.dot(rotDir) >= 0;
 	}
 
