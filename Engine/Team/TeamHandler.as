@@ -21,12 +21,12 @@ shared class TeamHandler : ITeamHandler
 
 	void SerializeInit(CBitStream@ bs)
 	{
-
+		bs.write_u8(team);
 	}
 
 	bool deserializeInit(CBitStream@ bs)
 	{
-		return true;
+		return bs.saferead_u8(team);
 	}
 
 	void SerializeTick(CBitStream@ bs)
