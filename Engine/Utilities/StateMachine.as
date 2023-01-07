@@ -1,6 +1,6 @@
-#include "Serializable.as"
+#include "ISerializable.as"
 
-shared class StateMachine : Serializable
+shared class StateMachine : ISerializable
 {
 	private dictionary states;
 	private uint currentIdentifier = -1;

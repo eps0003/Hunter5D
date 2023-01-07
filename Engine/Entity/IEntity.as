@@ -1,6 +1,6 @@
-#include "Serializable.as"
+#include "ISerializable.as"
 
-shared interface IEntity : Serializable
+shared interface IEntity : ISerializable
 {
 	u16 getId();
 	u8 getType();

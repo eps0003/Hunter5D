@@ -1,6 +1,6 @@
-#include "Serializable.as"
+#include "ISerializable.as"
 
-shared interface ITeamHandler : Serializable
+shared interface ITeamHandler : ISerializable
 {
 	u8 getTeamNum();
 	void SetTeamNum(u8 team);

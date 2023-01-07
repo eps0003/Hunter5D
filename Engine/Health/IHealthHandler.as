@@ -1,6 +1,6 @@
-#include "Serializable.as"
+#include "ISerializable.as"
 
-shared interface IHealthHandler : Serializable
+shared interface IHealthHandler : ISerializable
 {
 	u8 getHealth();
 	u8 getMaxHealth();

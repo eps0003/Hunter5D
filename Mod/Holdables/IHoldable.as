@@ -1,4 +1,4 @@
-shared interface IHoldable : Serializable
+shared interface IHoldable : ISerializable
 {
 	void Update();
 	void Draw();

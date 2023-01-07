@@ -1,4 +1,4 @@
-shared interface Serializable
+shared interface ISerializable
 {
 	void SerializeInit(CBitStream@ bs);
 	bool deserializeInit(CBitStream@ bs);
