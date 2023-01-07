@@ -355,6 +355,6 @@ shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
 
 	bool isNameplateVisible()
 	{
-		return true;
+		return !isMyActor();
 	}
 }

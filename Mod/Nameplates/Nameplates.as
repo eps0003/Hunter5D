@@ -29,8 +29,11 @@ void onRender(CRules@ this)
 
 		if (!nameplate.isNameplateVisible()) continue;
 
+		Vec3f worldPos = nameplate.getNameplatePosition();
+		if (!worldPos.isInFrontOfCamera()) continue;
+
 		string text = nameplate.getNameplateText();
-		Vec2f screenPos = nameplate.getNameplatePosition().projectToScreen();
+		Vec2f screenPos = worldPos.projectToScreen();
 		SColor color = nameplate.getNameplateColor();
 
 		GUI::DrawTextCentered(text, screenPos, color);
