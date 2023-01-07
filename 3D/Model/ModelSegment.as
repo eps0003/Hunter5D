@@ -54,7 +54,7 @@ shared class ModelSegment
 
 	void Render(CMatrix matrix, float t)
 	{
-		Transform(matrix);
+		this.Transform(matrix);
 
 		mesh.RenderMeshWithMaterial();
 
