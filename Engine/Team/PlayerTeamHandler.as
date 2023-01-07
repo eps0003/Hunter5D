@@ -18,4 +18,25 @@ shared class PlayerTeamHandler : ITeamHandler
 	{
 		player.server_setTeamNum(team);
 	}
+
+	// Player health is automatically synced
+	void SerializeInit(CBitStream@ bs)
+	{
+
+	}
+
+	bool deserializeInit(CBitStream@ bs)
+	{
+		return true;
+	}
+
+	void SerializeTick(CBitStream@ bs)
+	{
+
+	}
+
+	bool deserializeTick(CBitStream@ bs)
+	{
+		return true;
+	}
 }
