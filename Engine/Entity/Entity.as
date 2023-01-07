@@ -4,7 +4,6 @@
 shared class Entity
 {
 	private u16 id = 0;
-	private u8 team = 0;
 
 	Entity(u16 id)
 	{
@@ -20,16 +19,6 @@ shared class Entity
 	{
 		error("Entity doesn't have a type set: " + id);
 		return 0;
-	}
-
-	u8 getTeamNum()
-	{
-		return team;
-	}
-
-	void SetTeamNum(u8 team)
-	{
-		this.team = team;
 	}
 
 	void Kill()
