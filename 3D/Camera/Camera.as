@@ -3,6 +3,7 @@
 #include "Vec3f.as"
 #include "Frustum.as"
 #include "Interpolation.as"
+#include "ICameraController.as"
 
 shared class Camera
 {
@@ -21,6 +22,7 @@ shared class Camera
 	private float[] projectionMatrix;
 	private float[] rotationMatrix;
 
+	private ICameraController@ controller;
 	private Frustum frustum;
 
 	private Driver@ driver = getDriver();
@@ -40,10 +42,21 @@ shared class Camera
 		UpdateFrustum();
 	}
 
+	void SetController(ICameraController@ controller)
+	{
+		@this.controller = controller;
+	}
+
 	void Update()
 	{
 		prevPosition = position;
 		prevRotation = rotation;
+
+		if (controller !is null)
+		{
+			position = controller.getCameraPosition();
+			rotation = controller.getCameraRotation();
+		}
 	}
 
 	void Render()

@@ -10,7 +10,7 @@
 #include "PhysicalActorRunAnim.as"
 #include "Health.as"
 
-shared class PhysicalActor : Actor, Collision
+shared class PhysicalActor : Actor, Collision, ICameraController
 {
 	Vec3f position;
 	private Vec3f prevPosition;
@@ -30,7 +30,7 @@ shared class PhysicalActor : Actor, Collision
 	private ActorModel@ model;
 	private Health health;
 
-	Vec3f cameraPosition = Vec3f(0, 1.6f, 0);
+	private Vec3f cameraOffset = Vec3f(0, 1.6f, 0);
 
 	private float acceleration = 0.08f;
 	private float friction = 0.3f;
@@ -67,6 +67,11 @@ shared class PhysicalActor : Actor, Collision
 			@model = ActorModel("KnightSkin.png");
 			model.SetAnimation(PhysicalActorRunAnim(this, model));
 		}
+
+		if (isMyActor())
+		{
+			camera.SetController(this);
+		}
 	}
 
 	void PreUpdate()
@@ -92,15 +97,6 @@ shared class PhysicalActor : Actor, Collision
 			if (Maths::Abs(velocity.z) < 0.001f) velocity.z = 0;
 
 			this.Collision();
-		}
-	}
-
-	void PostUpdate()
-	{
-		if (isMyActor())
-		{
-			camera.position = position + cameraPosition;
-			camera.rotation = rotation;
 		}
 	}
 
@@ -356,5 +352,15 @@ shared class PhysicalActor : Actor, Collision
 	bool hasFullHealth()
 	{
 		return health.hasFullHealth();
+	}
+
+	Vec3f getCameraPosition()
+	{
+		return position + cameraOffset;
+	}
+
+	Vec3f getCameraRotation()
+	{
+		return rotation;
 	}
 }

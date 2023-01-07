@@ -5,7 +5,7 @@
 #include "Mouse.as"
 #include "Ray.as"
 
-shared class SpectatorActor : Actor
+shared class SpectatorActor : Actor, ICameraController
 {
 	Vec3f position;
 	private Vec3f prevPosition;
@@ -36,6 +36,14 @@ shared class SpectatorActor : Actor
 	{
 		prevPosition = position;
 		prevRotation = rotation;
+	}
+
+	void Init()
+	{
+		if (isMyActor())
+		{
+			camera.SetController(this);
+		}
 	}
 
 	void Update()
@@ -75,19 +83,11 @@ shared class SpectatorActor : Actor
 
 	void Render()
 	{
-		if (isMyActor())
+		if (isMyActor() && !g_videorecording)
 		{
 			float t = Interpolation::getFrameTime();
 			Vec3f pos = prevPosition.lerp(position, t);
-			Vec3f rot = prevRotation.lerpAngle(rotation, t);
-
-			camera.position = pos;
-			camera.rotation = rot;
-
-			if (!g_videorecording)
-			{
-				GUI::DrawText(pos.toString(), Vec2f(10, 10), color_white);
-			}
+			GUI::DrawText(pos.toString(), Vec2f(10, 10), color_white);
 		}
 	}
 
@@ -119,5 +119,15 @@ shared class SpectatorActor : Actor
 		if (!position.deserialize(bs)) return false;
 		if (!rotation.deserialize(bs)) return false;
 		return true;
+	}
+
+	Vec3f getCameraPosition()
+	{
+		return position;
+	}
+
+	Vec3f getCameraRotation()
+	{
+		return rotation;
 	}
 }

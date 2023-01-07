@@ -83,7 +83,7 @@ shared class HeldBlock : IHoldable
 		// Destroy block
 		if (blob.isKeyJustPressed(key_action2))
 		{
-			Ray ray(actor.position + actor.cameraPosition, actor.rotation.dir());
+			Ray ray(actor.getCameraPosition(), actor.getCameraRotation().dir());
 			RaycastInfo@ raycastInfo;
 			if (ray.raycastBlock(10, @raycastInfo))
 			{
@@ -96,7 +96,7 @@ shared class HeldBlock : IHoldable
 		// Place block
 		if (blob.isKeyJustPressed(key_action1))
 		{
-			Ray ray(actor.position + actor.cameraPosition, actor.rotation.dir());
+			Ray ray(actor.getCameraPosition(), actor.getCameraRotation().dir());
 			RaycastInfo@ raycastInfo;
 			if (ray.raycastBlock(10, @raycastInfo))
 			{
