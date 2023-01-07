@@ -209,21 +209,6 @@ shared class PhysicalActor : Actor, Collision, ICameraController
 		return true;
 	}
 
-	void SerializeTick(CBitStream@ bs)
-	{
-		Actor::SerializeTick(bs);
-		bs.write_u8(collisionFlags);
-		healthHandler.SerializeTick(bs);
-	}
-
-	bool deserializeTick(CBitStream@ bs)
-	{
-		if (!Actor::deserializeTick(bs)) return false;
-		if (!bs.saferead_u8(collisionFlags)) return false;
-		if (!healthHandler.deserializeTick(bs)) return false;
-		return true;
-	}
-
 	void SerializeInit(CBitStream@ bs)
 	{
 		Actor::SerializeInit(bs);
@@ -244,6 +229,21 @@ shared class PhysicalActor : Actor, Collision, ICameraController
 		if (!velocity.deserialize(bs)) return false;
 		if (!bs.saferead_u8(collisionFlags)) return false;
 		if (!healthHandler.deserializeInit(bs)) return false;
+		return true;
+	}
+
+	void SerializeTick(CBitStream@ bs)
+	{
+		Actor::SerializeTick(bs);
+		bs.write_u8(collisionFlags);
+		healthHandler.SerializeTick(bs);
+	}
+
+	bool deserializeTick(CBitStream@ bs)
+	{
+		if (!Actor::deserializeTick(bs)) return false;
+		if (!bs.saferead_u8(collisionFlags)) return false;
+		if (!healthHandler.deserializeTick(bs)) return false;
 		return true;
 	}
 
@@ -324,10 +324,6 @@ shared class PhysicalActor : Actor, Collision, ICameraController
 	void SetHealth(u8 val)
 	{
 		healthHandler.SetHealth(val);
-		if (healthHandler.getHealth() == 0)
-		{
-			Kill();
-		}
 	}
 
 	Vec3f getCameraPosition()

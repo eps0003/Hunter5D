@@ -15,7 +15,7 @@ shared class SMGBuilder : GunBuilder
 {
 	private Gun@ gun;
 
-	SMGBuilder(Actor@ actor)
+	SMGBuilder(IActor@ actor)
 	{
 		@gun = Gun(actor);
 	}

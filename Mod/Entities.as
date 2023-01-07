@@ -3,7 +3,7 @@
 #include "SandboxActor.as"
 #include "HunterActor.as"
 
-shared Entity@ getEntity(u8 type)
+shared IEntity@ getEntity(u8 type)
 {
 	switch (type)
 	{

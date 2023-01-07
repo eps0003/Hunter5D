@@ -1,7 +1,8 @@
-#include "EntityManager.as"
 #include "Entities.as"
+#include "EntityManager.as"
+#include "IEntity.as"
 
-shared class Entity
+shared class Entity : IEntity
 {
 	private u16 id = 0;
 
@@ -21,40 +22,12 @@ shared class Entity
 		return 0;
 	}
 
-	void Kill()
-	{
-		Entity::getManager().RemoveEntity(id);
-	}
-
-	void Init()
-	{
-
-	}
-
-	void PreUpdate()
-	{
-
-	}
-
-	void Update()
-	{
-
-	}
-
-	void PostUpdate()
-	{
-
-	}
-
-	void Render()
-	{
-
-	}
-
-	void Draw()
-	{
-
-	}
+	void Init() {}
+	void PreUpdate() {}
+	void Update() {}
+	void PostUpdate() {}
+	void Render() {}
+	void Draw() {}
 
 	void SerializeInit(CBitStream@ bs)
 	{

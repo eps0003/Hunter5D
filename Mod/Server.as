@@ -53,7 +53,7 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 		entityManager.RemoveActor(player);
 	}
 
-	Actor@ actor;
+	IActor@ actor;
 	if (player.getTeamNum() == this.getSpectatorTeamNum())
 	{
 		@actor = SpectatorActor(getUniqueId(), player, position);

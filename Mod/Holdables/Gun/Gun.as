@@ -9,7 +9,7 @@
 
 shared class Gun : IHoldable
 {
-	Actor@ actor;
+	IActor@ actor;
 
 	u16 type;
 	string name;
@@ -22,7 +22,7 @@ shared class Gun : IHoldable
 
 	private StateMachine states;
 
-	Gun(Actor@ actor)
+	Gun(IActor@ actor)
 	{
 		@this.actor = actor;
 

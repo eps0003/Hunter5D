@@ -1,9 +1,9 @@
-#include "Actor.as"
+#include "Entity.as"
 
 #define CLIENT_ONLY
 
 EntityManager@ entityManager;
-Entity@[] entities;
+IEntity@[] entities;
 
 void onInit(CRules@ this)
 {

@@ -3,23 +3,23 @@
 
 shared class EntityManager
 {
-	private Entity@[] entities;
+	private IEntity@[] entities;
 	private dictionary packets;
 
 	private CRules@ rules = getRules();
 
-	Entity@[] getEntities()
+	IEntity@[] getEntities()
 	{
 		return entities;
 	}
 
-	Actor@[] getActors()
+	IActor@[] getActors()
 	{
-		Actor@[] actors;
+		IActor@[] actors;
 
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			Actor@ actor = cast<Actor>(entities[i]);
+			IActor@ actor = cast<IActor>(entities[i]);
 			if (actor !is null)
 			{
 				actors.push_back(actor);
@@ -29,7 +29,7 @@ shared class EntityManager
 		return actors;
 	}
 
-	void AddEntity(Entity@ entity)
+	void AddEntity(IEntity@ entity)
 	{
 		u16 id = entity.getId();
 		u8 type = entity.getType();
@@ -41,7 +41,7 @@ shared class EntityManager
 			return;
 		}
 
-		Actor@ actor = cast<Actor>(entity);
+		IActor@ actor = cast<IActor>(entity);
 		if (actor !is null && actorExists(actor.getPlayer()))
 		{
 			error("Attempted to add actor for player that already has actor: " + actor.getPlayer().getUsername());
@@ -63,7 +63,7 @@ shared class EntityManager
 		}
 	}
 
-	void RemoveEntity(Entity@ entity)
+	void RemoveEntity(IEntity@ entity)
 	{
 		RemoveEntity(entity.getId());
 	}
@@ -87,7 +87,7 @@ shared class EntityManager
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			Actor@ actor = cast<Actor>(entities[i]);
+			IActor@ actor = cast<IActor>(entities[i]);
 			if (actor !is null && actor.getPlayer() is player)
 			{
 				RemoveEntityAtIndex(i);
@@ -101,7 +101,7 @@ shared class EntityManager
 
 	private void RemoveEntityAtIndex(uint index)
 	{
-		Entity@ entity = entities[index];
+		IEntity@ entity = entities[index];
 		u16 id = entity.getId();
 
 		if (isServer())
@@ -117,11 +117,11 @@ shared class EntityManager
 		print("Removed entity: " + id);
 	}
 
-	Entity@ getEntity(u16 id)
+	IEntity@ getEntity(u16 id)
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			Entity@ entity = entities[i];
+			IEntity@ entity = entities[i];
 			if (entity.getId() == id)
 			{
 				return entity;
@@ -130,11 +130,11 @@ shared class EntityManager
 		return null;
 	}
 
-	Actor@ getActor(CPlayer@ player)
+	IActor@ getActor(CPlayer@ player)
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			Actor@ actor = cast<Actor>(entities[i]);
+			IActor@ actor = cast<IActor>(entities[i]);
 			if (actor !is null && actor.getPlayer() is player)
 			{
 				return actor;
@@ -162,7 +162,7 @@ shared class EntityManager
 	{
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			Entity@ entity = entities[i];
+			IEntity@ entity = entities[i];
 
 			if (isServer())
 			{
@@ -171,7 +171,7 @@ shared class EntityManager
 				Command::Send("sync entity", bs, true);
 			}
 
-			Actor@ actor = cast<Actor>(entity);
+			IActor@ actor = cast<IActor>(entity);
 			if (actor !is null && actor.isMyActor() && !isServer())
 			{
 				CBitStream bs;
@@ -214,7 +214,7 @@ shared class EntityManager
 
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			Entity@ entity = entities[i];
+			IEntity@ entity = entities[i];
 
 			if (!isServer())
 			{
@@ -226,7 +226,7 @@ shared class EntityManager
 				}
 			}
 
-			Actor@ actor = cast<Actor>(entity);
+			IActor@ actor = cast<IActor>(entity);
 			if (actor !is null && !actor.isMyActor())
 			{
 				CBitStream@ bs;

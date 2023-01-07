@@ -1,6 +1,6 @@
 #include "Gun.as"
 
-shared Gun@ getGun(u8 type, Actor@ actor)
+shared Gun@ getGun(u8 type, IActor@ actor)
 {
     GunDirector director;
 

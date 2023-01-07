@@ -1,5 +1,4 @@
 #include "Entity.as"
-#include "Entities.as"
 
 EntityManager@ entityManager;
 
@@ -30,10 +29,10 @@ void onTick(CRules@ this)
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 {
-	Entity@[] entities = entityManager.getEntities();
+	IEntity@[] entities = entityManager.getEntities();
 	for (uint i = 0; i < entities.size(); i++)
 	{
-		Entity@ entity = entities[i];
+		IEntity@ entity = entities[i];
 
 		CBitStream bs;
 		bs.write_u8(entity.getType());
@@ -57,7 +56,7 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 		u8 type;
 		if (!params.saferead_u8(type)) return;
 
-		Entity@ entity = getEntity(type);
+		IEntity@ entity = getEntity(type);
 		if (entity is null)
 		{
 			error("Attempted to create entity with invalid type: " + type);
