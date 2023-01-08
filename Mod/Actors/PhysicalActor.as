@@ -5,13 +5,14 @@
 #include "Mouse.as"
 #include "Ray.as"
 #include "AABB.as"
-#include "Collision.as"
 #include "ActorModel.as"
 #include "PhysicalActorRunAnim.as"
 #include "HealthHandler.as"
 #include "INameplate.as"
+#include "ICollision.as"
+#include "BlockCollisionHandler.as"
 
-shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
+shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
 {
 	Vec3f position;
 	private Vec3f prevPosition;
@@ -32,13 +33,14 @@ shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
 
 	private u8 maxHealth = 10;
 	private IHealthHandler@ healthHandler;
+	private ICollisionHandler@ collisionHandler;
 
 	private Vec3f cameraOffset = Vec3f(0, 1.6f, 0);
 
 	private float acceleration = 0.08f;
 	private float friction = 0.3f;
-	private float jumpForce = 0.3f;
-	private float gravity = -0.04f;
+	private float jumpForce = 0.36f;
+	private float gravity = -0.045f;
 
 	private CControls@ controls = getControls();
 	private Camera@ camera = Camera::getCamera();
@@ -50,6 +52,7 @@ shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
 		this.position = position;
 		this.prevPosition = position;
 		@healthHandler = HealthHandler(maxHealth);
+		@collisionHandler = BlockCollisionHandler(this);
 	}
 
 	u8 getType()
@@ -89,18 +92,28 @@ shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
 	{
 		if (isMyActor())
 		{
-			// Gravity
-			velocity.y += gravity;
-
 			Rotation();
 			Movement();
+		}
+	}
+
+	void PostUpdate()
+	{
+		if (isMyActor())
+		{
+			// Gravity
+			velocity.y += gravity;
 
 			// Set velocity to zero if low enough
 			if (Maths::Abs(velocity.x) < 0.001f) velocity.x = 0;
 			if (Maths::Abs(velocity.y) < 0.001f) velocity.y = 0;
 			if (Maths::Abs(velocity.z) < 0.001f) velocity.z = 0;
 
-			this.Collision();
+			// Handle collision
+			collisionHandler.handleCollision();
+
+			// Apply velocity
+			position += velocity;
 		}
 	}
 
@@ -130,43 +143,13 @@ shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
 		}
 
 		// Jumping
-		if (isOnGround() && controls.ActionKeyPressed(AK_ACTION3))
+		if (collisionHandler.isOnGround() && controls.ActionKeyPressed(AK_ACTION3))
 		{
 			velocity.y = jumpForce;
 		}
 
 		velocity.x += dir.x * acceleration - friction * velocity.x;
 		velocity.z += dir.y * acceleration - friction * velocity.z;
-	}
-
-	private void Collision()
-	{
-		if (hasCollider())
-		{
-			// Move along x axis if no collision occurred
-			Vec3f posTemp = position;
-			Vec3f velTemp = velocity;
-			bool collisionX = CollisionX(this, posTemp, velTemp);
-			if (!collisionX)
-			{
-				position = posTemp;
-				velocity = velTemp;
-			}
-
-			CollisionZ(this, position, velocity);
-
-			// Check x collision again if a collision occurred initially
-			if (collisionX)
-			{
-				CollisionX(this, position, velocity);
-			}
-
-			CollisionY(this, position, velocity);
-		}
-		else
-		{
-			position += velocity;
-		}
 	}
 
 	void Render()
@@ -223,6 +206,7 @@ shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
 	bool deserializeInit(CBitStream@ bs)
 	{
 		@healthHandler = HealthHandler(maxHealth);
+		@collisionHandler = BlockCollisionHandler(this);
 
 		if (!Actor::deserializeInit(bs)) return false;
 		if (!position.deserialize(bs)) return false;
@@ -283,15 +267,6 @@ shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
 	bool hasCollisionFlags(u8 flags)
 	{
 		return (collisionFlags & flags) == flags;
-	}
-
-	bool isOnGround()
-	{
-		return (
-			hasCollider() &&
-			hasCollisionFlags(CollisionFlag::Blocks) &&
-			collider.enteringBlock(position, position + Vec3f(0, -0.001f, 0))
-		);
 	}
 
 	void DrawCrosshair(int spacing, int length, int thickness, SColor color)
@@ -356,5 +331,25 @@ shared class PhysicalActor : Actor, Collision, ICameraController, INameplate
 	bool isNameplateVisible()
 	{
 		return !isMyActor();
+	}
+
+	Vec3f getPosition()
+	{
+		return position;
+	}
+
+	void SetPosition(Vec3f position)
+	{
+		this.position = position;
+	}
+
+	Vec3f getVelocity()
+	{
+		return velocity;
+	}
+
+	void SetVelocity(Vec3f velocity)
+	{
+		this.velocity = velocity;
 	}
 }
