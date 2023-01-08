@@ -3,10 +3,10 @@
 
 shared class BlockCollisionHandler : ICollisionHandler
 {
-	private ICollision@ entity;
+	private IPhysics@ entity;
 	private Map@ map;
 
-	BlockCollisionHandler(ICollision@ entity)
+	BlockCollisionHandler(IPhysics@ entity)
 	{
 		@this.entity = entity;
 		@map = Map::getMap();

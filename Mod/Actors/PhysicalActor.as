@@ -9,10 +9,10 @@
 #include "PhysicalActorRunAnim.as"
 #include "HealthHandler.as"
 #include "INameplate.as"
-#include "ICollision.as"
+#include "ICollisionHandler.as"
 #include "BlockCollisionHandler.as"
 
-shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
+shared class PhysicalActor : Actor, ICameraController, INameplate, IPhysics
 {
 	Vec3f position;
 	private Vec3f prevPosition;
@@ -27,20 +27,19 @@ shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
 	Vec3f interVelocity;
 
 	private AABB@ collider;
-	private u8 collisionFlags = 0;
+	private ICollisionHandler@ collisionHandler;
 
 	private ActorModel@ model;
 
 	private u8 maxHealth = 10;
 	private IHealthHandler@ healthHandler;
-	private ICollisionHandler@ collisionHandler;
 
 	private Vec3f cameraOffset = Vec3f(0, 1.6f, 0);
 
 	private float acceleration = 0.08f;
 	private float friction = 0.3f;
 	private float jumpForce = 0.36f;
-	private float gravity = -0.045f;
+	private Vec3f gravity = Vec3f(0, -0.045f, 0);
 
 	private CControls@ controls = getControls();
 	private Camera@ camera = Camera::getCamera();
@@ -63,11 +62,6 @@ shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
 	void Init()
 	{
 		SetCollider(AABB(Vec3f(-0.3f, 0, -0.3f), Vec3f(0.3f, 1.8f, 0.3f)));
-
-		if (isServer())
-		{
-			SetCollisionFlags(CollisionFlag::All);
-		}
 
 		if (isClient())
 		{
@@ -94,26 +88,6 @@ shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
 		{
 			Rotation();
 			Movement();
-		}
-	}
-
-	void PostUpdate()
-	{
-		if (isMyActor())
-		{
-			// Gravity
-			velocity.y += gravity;
-
-			// Set velocity to zero if low enough
-			if (Maths::Abs(velocity.x) < 0.001f) velocity.x = 0;
-			if (Maths::Abs(velocity.y) < 0.001f) velocity.y = 0;
-			if (Maths::Abs(velocity.z) < 0.001f) velocity.z = 0;
-
-			// Handle collision
-			collisionHandler.handleCollision();
-
-			// Apply velocity
-			position += velocity;
 		}
 	}
 
@@ -199,7 +173,7 @@ shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
 		position.Serialize(bs);
 		rotation.Serialize(bs);
 		velocity.Serialize(bs);
-		bs.write_u8(collisionFlags);
+		gravity.Serialize(bs);
 		healthHandler.SerializeInit(bs);
 	}
 
@@ -212,7 +186,7 @@ shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
 		if (!position.deserialize(bs)) return false;
 		if (!rotation.deserialize(bs)) return false;
 		if (!velocity.deserialize(bs)) return false;
-		if (!bs.saferead_u8(collisionFlags)) return false;
+		if (!gravity.deserialize(bs)) return false;
 		if (!healthHandler.deserializeInit(bs)) return false;
 		return true;
 	}
@@ -220,14 +194,14 @@ shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
 	void SerializeTick(CBitStream@ bs)
 	{
 		Actor::SerializeTick(bs);
-		bs.write_u8(collisionFlags);
+		gravity.Serialize(bs);
 		healthHandler.SerializeTick(bs);
 	}
 
 	bool deserializeTick(CBitStream@ bs)
 	{
 		if (!Actor::deserializeTick(bs)) return false;
-		if (!bs.saferead_u8(collisionFlags)) return false;
+		if (!gravity.deserialize(bs)) return false;
 		if (!healthHandler.deserializeTick(bs)) return false;
 		return true;
 	}
@@ -245,28 +219,6 @@ shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
 	bool hasCollider()
 	{
 		return collider !is null;
-	}
-
-	void AddCollisionFlags(u8 flags)
-	{
-		SetCollisionFlags(collisionFlags | flags);
-	}
-
-	void RemoveCollisionFlags(u8 flags)
-	{
-		SetCollisionFlags(collisionFlags & ~flags);
-	}
-
-	void SetCollisionFlags(u8 flags)
-	{
-		if (collisionFlags == flags) return;
-
-		collisionFlags = flags;
-	}
-
-	bool hasCollisionFlags(u8 flags)
-	{
-		return (collisionFlags & flags) == flags;
 	}
 
 	void DrawCrosshair(int spacing, int length, int thickness, SColor color)
@@ -351,5 +303,25 @@ shared class PhysicalActor : Actor, ICameraController, INameplate, ICollision
 	void SetVelocity(Vec3f velocity)
 	{
 		this.velocity = velocity;
+	}
+
+	Vec3f getGravity()
+	{
+		return gravity;
+	}
+
+	void SetGravity(Vec3f gravity)
+	{
+		this.gravity = gravity;
+	}
+
+	ICollisionHandler@ getCollisionHandler()
+	{
+		return collisionHandler;
+	}
+
+	void SetCollisionHandler(ICollisionHandler@ handler)
+	{
+		@collisionHandler = handler;
 	}
 }

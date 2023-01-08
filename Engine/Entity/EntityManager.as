@@ -1,12 +1,19 @@
 #include "Entity.as"
 #include "Actor.as"
+#include "PhysicsHandler.as"
 
 shared class EntityManager
 {
 	private IEntity@[] entities;
 	private dictionary packets;
 
+	private IPhysicsHandler@ physicsHandler;
 	private CRules@ rules = getRules();
+
+	EntityManager()
+	{
+		@physicsHandler = PhysicsHandler();
+	}
 
 	IEntity@[] getEntities()
 	{
@@ -238,6 +245,13 @@ shared class EntityManager
 			}
 
 			entity.Update();
+
+			// Physics
+			IPhysics@ physicsEntity = cast<IPhysics>(entity);
+			if (physicsEntity !is null)
+			{
+				physicsHandler.Update(physicsEntity);
+			}
 		}
 
 		for (uint i = 0; i < entities.size(); i++)

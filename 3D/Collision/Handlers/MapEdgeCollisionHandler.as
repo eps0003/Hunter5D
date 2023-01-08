@@ -2,10 +2,10 @@
 
 shared class MapEdgeCollisionHandler : ICollisionHandler
 {
-	private ICollision@ entity;
+	private IPhysics@ entity;
 	private Vec3f mapDim;
 
-	MapEdgeCollisionHandler(ICollision@ entity)
+	MapEdgeCollisionHandler(IPhysics@ entity)
 	{
 		@this.entity = entity;
 		mapDim = Map::getMap().dimensions;
