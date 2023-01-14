@@ -1,5 +1,6 @@
-#include "Entity.as"
+#include "ActorManager.as"
 #include "IActor.as"
+#include "Entity.as"
 #include "PlayerTeamHandler.as"
 
 shared class Actor : IActor
@@ -24,6 +25,11 @@ shared class Actor : IActor
 	{
 		error("Actor doesn't have a type set: " + id);
 		return 0;
+	}
+
+	string getName()
+	{
+		return player.getUsername();
 	}
 
 	CPlayer@ getPlayer()

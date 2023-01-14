@@ -22,6 +22,11 @@ shared class Entity : IEntity
 		return 0;
 	}
 
+	string getName()
+	{
+		return "Entity" + id;
+	}
+
 	void Init() {}
 	void PreUpdate() {}
 	void Update() {}

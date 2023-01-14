@@ -1,4 +1,4 @@
-Driver@ driver;
+#include "IEntity.as"
 
 void onInit(CRules@ this)
 {
@@ -15,11 +15,6 @@ void onInit(CRules@ this)
 
 void onRestart(CRules@ this)
 {
-	if (isClient())
-	{
-		@driver = getDriver();
-	}
-
 	if (isServer())
 	{
 		this.add_u8("game index", 1);
@@ -28,7 +23,10 @@ void onRestart(CRules@ this)
 
 	this.set("mouse", null);
 
+	this.set("entities", array<IEntity@>());
 	this.set("entity manager", null);
+	this.set("actor manager", null);
+
 	this.set("loading manager", null);
 
 	// TODO: Move 3D-specific resets out of engine

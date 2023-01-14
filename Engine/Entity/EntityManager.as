@@ -1,17 +1,17 @@
-#include "Entity.as"
-#include "Actor.as"
+#include "IEntityManager.as"
 #include "PhysicsHandler.as"
 
-shared class EntityManager
+shared class EntityManager : IEntityManager
 {
-	private IEntity@[] entities;
+	private IEntity@[]@ entities;
 	private dictionary packets;
 
 	private IPhysicsHandler@ physicsHandler;
 	private CRules@ rules = getRules();
 
-	EntityManager()
+	EntityManager(IEntity@[]@ entities)
 	{
+		@this.entities = entities;
 		@physicsHandler = PhysicsHandler();
 	}
 
@@ -20,20 +20,17 @@ shared class EntityManager
 		return entities;
 	}
 
-	IActor@[] getActors()
+	IEntity@ getEntity(u16 id)
 	{
-		IActor@[] actors;
-
 		for (uint i = 0; i < entities.size(); i++)
 		{
-			IActor@ actor = cast<IActor>(entities[i]);
-			if (actor !is null)
+			IEntity@ entity = entities[i];
+			if (entity.getId() == id)
 			{
-				actors.push_back(actor);
+				return entity;
 			}
 		}
-
-		return actors;
+		return null;
 	}
 
 	void AddEntity(IEntity@ entity)
@@ -43,21 +40,13 @@ shared class EntityManager
 
 		if (entityExists(id))
 		{
-			error("Attempted to add entity with ID already in use: " + type);
-			printTrace();
-			return;
-		}
-
-		IActor@ actor = cast<IActor>(entity);
-		if (actor !is null && actorExists(actor.getPlayer()))
-		{
-			error("Attempted to add actor for player that already has actor: " + actor.getPlayer().getUsername());
+			error("Attempted to add entity with ID already in use: " + id);
 			printTrace();
 			return;
 		}
 
 		entities.push_back(entity);
-		print("Added entity: " + id);
+		print("Added entity: " + entity.getName());
 
 		entity.Init();
 
@@ -90,22 +79,6 @@ shared class EntityManager
 		printTrace();
 	}
 
-	void RemoveActor(CPlayer@ player)
-	{
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			IActor@ actor = cast<IActor>(entities[i]);
-			if (actor !is null && actor.getPlayer() is player)
-			{
-				RemoveEntityAtIndex(i);
-				return;
-			}
-		}
-
-		error("Attempted to remove actor for player that doesn't have an actor: " + player.getUsername());
-		printTrace();
-	}
-
 	private void RemoveEntityAtIndex(uint index)
 	{
 		IEntity@ entity = entities[index];
@@ -119,35 +92,7 @@ shared class EntityManager
 		}
 
 		entities.removeAt(index);
-		packets.delete("entity" + id);
-		packets.delete("actor" + id);
-		print("Removed entity: " + id);
-	}
-
-	IEntity@ getEntity(u16 id)
-	{
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			IEntity@ entity = entities[i];
-			if (entity.getId() == id)
-			{
-				return entity;
-			}
-		}
-		return null;
-	}
-
-	IActor@ getActor(CPlayer@ player)
-	{
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			IActor@ actor = cast<IActor>(entities[i]);
-			if (actor !is null && actor.getPlayer() is player)
-			{
-				return actor;
-			}
-		}
-		return null;
+		print("Removed entity: " + entity.getName());
 	}
 
 	bool entityExists(u16 id)
@@ -155,37 +100,9 @@ shared class EntityManager
 		return getEntity(id) !is null;
 	}
 
-	bool actorExists(CPlayer@ player)
-	{
-		return getActor(player) !is null;
-	}
-
 	uint getEntityCount()
 	{
 		return entities.size();
-	}
-
-	void SyncEntities()
-	{
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			IEntity@ entity = entities[i];
-
-			if (isServer())
-			{
-				CBitStream bs;
-				entity.SerializeTick(bs);
-				Command::Send("sync entity", bs, true);
-			}
-
-			IActor@ actor = cast<IActor>(entity);
-			if (actor !is null && actor.isMyActor() && !isServer())
-			{
-				CBitStream bs;
-				actor.SerializeTickClient(bs);
-				Command::Send("sync actor", bs, true);
-			}
-		}
 	}
 
 	void DeserializeEntity(CBitStream@ bs)
@@ -210,6 +127,29 @@ shared class EntityManager
 		if (!bs.saferead_u16(id)) return;
 
 		packets.set("actor" + id, bs2);
+	}
+
+	void SyncEntities()
+	{
+		for (uint i = 0; i < entities.size(); i++)
+		{
+			IEntity@ entity = entities[i];
+
+			if (isServer())
+			{
+				CBitStream bs;
+				entity.SerializeTick(bs);
+				Command::Send("sync entity", bs, true);
+			}
+
+			IActor@ actor = cast<IActor>(entity);
+			if (actor !is null && actor.isMyActor() && !isServer())
+			{
+				CBitStream bs;
+				actor.SerializeTickClient(bs);
+				Command::Send("sync actor", bs, true);
+			}
+		}
 	}
 
 	void UpdateEntities()
@@ -284,7 +224,10 @@ namespace Entity
 		EntityManager@ manager;
 		if (!getRules().get("entity manager", @manager))
 		{
-			@manager = EntityManager();
+			IEntity@[]@ entities;
+			getRules().get("entities", @entities);
+
+			@manager = EntityManager(entities);
 			getRules().set("entity manager", @manager);
 		}
 		return manager;

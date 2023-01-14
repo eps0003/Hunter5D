@@ -266,7 +266,7 @@ shared class PhysicalActor : Actor, ICameraController, INameplate, IPhysics
 
 	string getNameplateText()
 	{
-		return getPlayer().getCharacterName();
+		return getName();
 	}
 
 	Vec3f getNameplatePosition()

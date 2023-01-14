@@ -1,6 +1,8 @@
 #include "Entity.as"
+#include "Actor.as"
 
 EntityManager@ entityManager;
+IActorManager@ actorManager;
 
 void onInit(CRules@ this)
 {
@@ -15,6 +17,7 @@ void onInit(CRules@ this)
 void onRestart(CRules@ this)
 {
 	@entityManager = Entity::getManager();
+	@actorManager = Actor::getManager();
 }
 
 void onTick(CRules@ this)
@@ -43,9 +46,9 @@ void onNewPlayerJoin(CRules@ this, CPlayer@ player)
 
 void onPlayerLeave(CRules@ this, CPlayer@ player)
 {
-	if (isServer() && entityManager.actorExists(player))
+	if (isServer() && actorManager.actorExists(player))
 	{
-		entityManager.RemoveActor(player);
+		actorManager.RemoveActor(player);
 	}
 }
 

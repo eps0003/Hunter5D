@@ -4,7 +4,7 @@
 
 #define SERVER_ONLY
 
-EntityManager@ entityManager;
+IActorManager@ actorManager;
 Map@ map;
 
 void onRestart(CRules@ this)
@@ -14,7 +14,7 @@ void onRestart(CRules@ this)
 
 void onInit(CRules@ this)
 {
-	@entityManager = Entity::getManager();
+	@actorManager = Actor::getManager();
 	@map = Map::getMap();
 }
 
@@ -48,9 +48,9 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 {
 	Vec3f position = map.dimensions * Vec3f(0.5f, 1.0f, 0.5f);
 
-	if (entityManager.actorExists(player))
+	if (actorManager.actorExists(player))
 	{
-		entityManager.RemoveActor(player);
+		actorManager.RemoveActor(player);
 	}
 
 	IActor@ actor;
@@ -63,5 +63,5 @@ void SpawnPlayer(CRules@ this, CPlayer@ player)
 		@actor = SandboxActor(getUniqueId(), player, position);
 	}
 
-	entityManager.AddEntity(actor);
+	actorManager.AddActor(actor);
 }
