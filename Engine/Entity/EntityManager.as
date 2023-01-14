@@ -1,18 +1,14 @@
 #include "IEntityManager.as"
-#include "PhysicsHandler.as"
 
 shared class EntityManager : IEntityManager
 {
 	private IEntity@[]@ entities;
-	private dictionary packets;
 
-	private IPhysicsHandler@ physicsHandler;
 	private CRules@ rules = getRules();
 
 	EntityManager(IEntity@[]@ entities)
 	{
 		@this.entities = entities;
-		@physicsHandler = PhysicsHandler();
 	}
 
 	IEntity@[] getEntities()
@@ -104,124 +100,13 @@ shared class EntityManager : IEntityManager
 	{
 		return entities.size();
 	}
-
-	void DeserializeEntity(CBitStream@ bs)
-	{
-		CBitStream bs2;
-		bs2.writeBitStream(bs, bs.getBitIndex(), bs.getBitsUsed() - bs.getBitIndex());
-		bs2.ResetBitIndex();
-
-		u16 id;
-		if (!bs.saferead_u16(id)) return;
-
-		packets.set("entity" + id, bs2);
-	}
-
-	void DeserializeActor(CBitStream@ bs)
-	{
-		CBitStream bs2;
-		bs2.writeBitStream(bs, bs.getBitIndex(), bs.getBitsUsed() - bs.getBitIndex());
-		bs2.ResetBitIndex();
-
-		u16 id;
-		if (!bs.saferead_u16(id)) return;
-
-		packets.set("actor" + id, bs2);
-	}
-
-	void SyncEntities()
-	{
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			IEntity@ entity = entities[i];
-
-			if (isServer())
-			{
-				CBitStream bs;
-				entity.SerializeTick(bs);
-				Command::Send("sync entity", bs, true);
-			}
-
-			IActor@ actor = cast<IActor>(entity);
-			if (actor !is null && actor.isMyActor() && !isServer())
-			{
-				CBitStream bs;
-				actor.SerializeTickClient(bs);
-				Command::Send("sync actor", bs, true);
-			}
-		}
-	}
-
-	void UpdateEntities()
-	{
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			entities[i].PreUpdate();
-		}
-
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			IEntity@ entity = entities[i];
-
-			if (!isServer())
-			{
-				CBitStream@ bs;
-				if (packets.get("entity" + entity.getId(), @bs))
-				{
-					bs.ResetBitIndex();
-					entity.deserializeTick(bs);
-				}
-			}
-
-			IActor@ actor = cast<IActor>(entity);
-			if (actor !is null && !actor.isMyActor())
-			{
-				CBitStream@ bs;
-				if (packets.get("actor" + actor.getId(), @bs))
-				{
-					bs.ResetBitIndex();
-					actor.deserializeTickClient(bs);
-				}
-			}
-
-			entity.Update();
-
-			// Physics
-			IPhysics@ physicsEntity = cast<IPhysics>(entity);
-			if (physicsEntity !is null)
-			{
-				physicsHandler.Update(physicsEntity);
-			}
-		}
-
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			entities[i].PostUpdate();
-		}
-	}
-
-	void RenderEntities()
-	{
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			entities[i].Render();
-		}
-	}
-
-	void DrawEntities()
-	{
-		for (uint i = 0; i < entities.size(); i++)
-		{
-			entities[i].Draw();
-		}
-	}
 }
 
 namespace Entity
 {
-	shared EntityManager@ getManager()
+	shared IEntityManager@ getManager()
 	{
-		EntityManager@ manager;
+		IEntityManager@ manager;
 		if (!getRules().get("entity manager", @manager))
 		{
 			IEntity@[]@ entities;

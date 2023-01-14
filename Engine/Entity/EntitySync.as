@@ -1,8 +1,14 @@
 #include "Entity.as"
 #include "Actor.as"
+#include "EntitySyncer.as"
+#include "ActorSyncer.as"
+#include "PhysicsHandler.as"
 
-EntityManager@ entityManager;
+IEntityManager@ entityManager;
 IActorManager@ actorManager;
+IEntitySyncer@ entitySyncer;
+IEntitySyncer@ actorSyncer;
+IPhysicsHandler@ physicsHandler;
 
 void onInit(CRules@ this)
 {
@@ -18,16 +24,46 @@ void onRestart(CRules@ this)
 {
 	@entityManager = Entity::getManager();
 	@actorManager = Actor::getManager();
+	@entitySyncer = EntitySyncer();
+	@actorSyncer = ActorSyncer();
+	@physicsHandler = PhysicsHandler();
 }
 
 void onTick(CRules@ this)
 {
-	if (getPlayerCount() > 0)
+	IEntity@[] entities = entityManager.getEntities();
+
+	for (uint i = 0; i < entities.size(); i++)
 	{
-		entityManager.SyncEntities();
+		entities[i].PreUpdate();
 	}
 
-	entityManager.UpdateEntities();
+	// Receive most up-to-date entity data
+	entitySyncer.Receive();
+	actorSyncer.Receive();
+
+	for (uint i = 0; i < entities.size(); i++)
+	{
+		IEntity@ entity = entities[i];
+
+		entity.Update();
+
+		// Handle physics
+		IPhysics@ physicsEntity = cast<IPhysics>(entity);
+		if (physicsEntity !is null)
+		{
+			physicsHandler.Update(physicsEntity);
+		}
+	}
+
+	for (uint i = 0; i < entities.size(); i++)
+	{
+		entities[i].PostUpdate();
+	}
+
+	// Sync updated entity data
+	entitySyncer.Sync();
+	actorSyncer.Sync();
 }
 
 void onNewPlayerJoin(CRules@ this, CPlayer@ player)
@@ -72,11 +108,11 @@ void onCommand(CRules@ this, u8 cmd, CBitStream@ params)
 	}
 	else if (!isServer() && Command::equals(cmd, "sync entity"))
 	{
-		entityManager.DeserializeEntity(params);
+		entitySyncer.DeserializePacket(params);
 	}
 	else if (Command::equals(cmd, "sync actor"))
 	{
-		entityManager.DeserializeActor(params);
+		actorSyncer.DeserializePacket(params);
 	}
 	else if (!isServer() && Command::equals(cmd, "remove entity"))
 	{

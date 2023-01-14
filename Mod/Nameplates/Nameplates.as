@@ -2,7 +2,7 @@
 
 #define CLIENT_ONLY
 
-EntityManager@ entityManager;
+IEntityManager@ entityManager;
 IEntity@[] entities;
 
 void onInit(CRules@ this)

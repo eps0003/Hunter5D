@@ -2,7 +2,7 @@
 
 shared Gun@ getGun(u8 type, IActor@ actor)
 {
-    GunDirector director;
+	GunDirector director;
 
 	switch (type)
 	{

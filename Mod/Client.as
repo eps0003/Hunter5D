@@ -6,7 +6,8 @@
 
 Camera@ camera;
 MapRenderer@ mapRenderer;
-EntityManager@ entityManager;
+IEntityManager@ entityManager;
+IEntity@[] entities;
 uint renderId;
 
 void onRestart(CRules@ this)
@@ -24,9 +25,17 @@ void onInit(CRules@ this)
 	renderId = Render::addScript(Render::layer_prehud, "Client.as", "Render", 0);
 }
 
+void onTick(CRules@ this)
+{
+	entities = entityManager.getEntities();
+}
+
 void onRender(CRules@ this)
 {
-	entityManager.DrawEntities();
+	for (uint i = 0; i < entities.size(); i++)
+	{
+		entities[i].Draw();
+	}
 }
 
 void Render(int id)
@@ -38,5 +47,9 @@ void Render(int id)
 
 	camera.Render();
 	mapRenderer.Render();
-	entityManager.RenderEntities();
+
+	for (uint i = 0; i < entities.size(); i++)
+	{
+		entities[i].Render();
+	}
 }
