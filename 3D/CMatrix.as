@@ -112,4 +112,53 @@ shared class CMatrix
 	{
 		return matrix;
 	}
+
+	void Print(uint precision = 3)
+	{
+		for (uint j = 0; j < 4; j++)
+		{
+			string text = j == 0 ? "[[" : " [";
+
+			for (uint i = 0; i < 4; i++)
+			{
+				if (i != 0)
+				{
+					text += ", ";
+				}
+
+				text += formatFloat(matrix[j * 4 + i], "", 0, precision);
+			}
+
+			text += j == 3 ? "]]" : "]";
+
+			print(text);
+		}
+	}
+
+	string toString(uint precision = 3)
+	{
+		string text;
+
+		for (uint i = 0; i < matrix.size(); i++)
+		{
+			if (i != 0)
+			{
+				text += ", ";
+			}
+
+			if (i % 4 == 0)
+			{
+				text += "[";
+			}
+
+			text += formatFloat(matrix[i], "", 0, precision);
+
+			if (i % 4 == 3)
+			{
+				text += "]";
+			}
+		}
+
+		return "[" + text + "]";
+	}
 }
