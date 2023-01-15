@@ -23,7 +23,7 @@ shared class Vec3f
 
 	Vec3f(Vec3f vec, float mag)
 	{
-		vec = vec.normalized();
+		vec = vec.normalize();
 		x = vec.x * mag;
 		y = vec.y * mag;
 		z = vec.z * mag;
@@ -196,32 +196,27 @@ shared class Vec3f
 		return "(" + formatFloat(x, "", 0, precision) + ", " + formatFloat(y, "", 0, precision) + ", " + formatFloat(z, "", 0, precision) + ")";
 	}
 
-	Vec3f normalized()
+	Vec3f normalize()
 	{
-		float lengthSq = magSquared();
-		if (lengthSq == 0 || lengthSq == 1)
+		float magnitudeSq = magSquared();
+		if (magnitudeSq <= 0 || magnitudeSq == 1)
 		{
 			return this;
 		}
-		return this / mag();
+
+    	float invMagnitude = 1.0f / Maths::Sqrt(magnitudeSq);
+		return this * invMagnitude;
 	}
 
 	void Normalize()
 	{
-		float lengthSq = magSquared();
-		if (lengthSq == 0)
-		{
-			x = 0;
-			y = 0;
-			z = 0;
-		}
-		else if (lengthSq != 1)
-		{
-			float len = mag();
-			x /= len;
-			y /= len;
-			z /= len;
-		}
+		float magnitudeSq = magSquared();
+		if (magnitudeSq <= 0 || magnitudeSq == 1) return;
+
+    	float invMagnitude = 1.0f / Maths::Sqrt(magnitudeSq);
+		x *= invMagnitude;
+		y *= invMagnitude;
+		z *= invMagnitude;
 	}
 
 	float mag()

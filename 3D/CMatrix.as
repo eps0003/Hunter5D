@@ -37,9 +37,9 @@ shared class CMatrix
 		return CMatrix(multMatrix);
 	}
 
-	CMatrix@ opMulAssign(const CMatrix&in matrix)
+	CMatrix@ opMulAssign(const CMatrix&in other)
 	{
-		Matrix::MultiplyImmediate(this.matrix, matrix.matrix);
+		Matrix::MultiplyImmediate(this.matrix, other.matrix);
 		return this;
 	}
 

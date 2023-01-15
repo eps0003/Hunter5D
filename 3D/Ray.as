@@ -9,7 +9,7 @@ shared class Ray
 	Ray(Vec3f position, Vec3f direction)
 	{
 		this.position = position;
-		this.direction = direction.normalized();
+		this.direction = direction.normalize();
 	}
 
 	// https://theshoemaker.de/2016/02/ray-casting-in-2d-grids/
