@@ -183,7 +183,7 @@ shared class Camera
 	private void UpdateFog()
 	{
 		float renderDistance = getRenderDistance();
-		Render::SetFog(fogColor, SMesh::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
+		Render::SetFog(fogColor, Render::LINEAR, renderDistance - 10, renderDistance, 0, false, true);
 	}
 
 	private void UpdateFrustum()
